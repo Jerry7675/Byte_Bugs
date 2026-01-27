@@ -20,7 +20,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["./*"],
       "@api/*": ["./src/server/api/*"],
       "@components/*": ["./src/components/*"]
     }

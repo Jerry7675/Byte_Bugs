@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/ui/button';
 import { ArrowRight, Rocket, TrendingUp } from 'lucide-react';
 
 const HeroSection = () => {
