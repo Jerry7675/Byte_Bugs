@@ -2,7 +2,8 @@ import { signupUser } from '../../../../server/api/auth';
 
 export async function POST(req: Request) {
   try {
-    const { email, password, firstName, middleName, lastName, dob, phoneNumber } = await req.json();
+    const { email, password, firstName, middleName, lastName, dob, phoneNumber, role } =
+      await req.json();
     const result = await signupUser({
       email,
       password,
@@ -11,6 +12,7 @@ export async function POST(req: Request) {
       lastName,
       dob,
       phoneNumber,
+      role,
     });
     if (result !== null && 'error' in result) {
       return new Response(JSON.stringify({ error: result }), {

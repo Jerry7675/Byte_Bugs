@@ -43,6 +43,8 @@ export async function POST(req: NextRequest) {
     const resetToken = jwt.sign({ userId: user.id }, JWT_FORGOT_PASSWORD_SECRET, {
       expiresIn: '15m',
     });
+    // Save token in user table
+    await ForgotPasswordService.saveResetToken(user.id, resetToken);
     await ForgotPasswordService.clearOTP(email);
     return NextResponse.json({ token: resetToken });
   } catch (err) {

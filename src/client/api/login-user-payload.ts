@@ -6,6 +6,7 @@ export interface LoginPayload {
 export interface LoginResponse {
   accessToken?: string;
   error?: string;
+  success?: boolean;
 }
 
 export async function loginUser(payload: LoginPayload): Promise<LoginResponse> {
@@ -19,7 +20,7 @@ export async function loginUser(payload: LoginPayload): Promise<LoginResponse> {
     const data = await res.json();
     const accessToken = res.headers.get('Authorization')?.replace('Bearer ', '');
     if (res.ok) {
-      return { accessToken };
+      return { accessToken, success: true };
     } else {
       return { error: data.error?.error || 'Unknown error' };
     }

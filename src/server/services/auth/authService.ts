@@ -3,7 +3,7 @@ import { prismaService } from '../../../lib/prisma.service';
 import { validateLogin } from '../../validators/loginValidation';
 import { JwtService } from '../../lib/jwt.service';
 import { addMinutes } from 'date-fns';
-import { generateSalt, hashString } from '../../lib/hash.service';
+import { hashString } from '../../lib/hash.service';
 import { validateSignup } from '../../validators/signupValidation';
 import { PrismaEnums } from '../../../enumWrapper';
 import { logger } from '../../lib/logger';
@@ -16,8 +16,9 @@ export async function signupUserService(params: {
   lastName: string;
   dob: string;
   phoneNumber: string;
+  role: PrismaEnums.UserRole;
 }) {
-  const { email, password, firstName, middleName, lastName, dob, phoneNumber } = params;
+  const { email, password, firstName, middleName, lastName, dob, phoneNumber, role } = params;
   const valid = await validateSignup({
     email,
     password,
@@ -26,6 +27,7 @@ export async function signupUserService(params: {
     lastName,
     dob,
     phoneNumber,
+    role,
   });
   if (!valid.success) {
     logger.warn('Signup validation failed', { error: valid.error });
@@ -52,7 +54,7 @@ export async function signupUserService(params: {
         firstName,
         middleName,
         lastName,
-        role: PrismaEnums.UserRole.STARTUP,
+        role: PrismaEnums.UserRole[role],
         dob: new Date(dob),
         phoneNumber,
       },

@@ -1,6 +1,7 @@
 import { loginUserService } from '../../services/auth/authService';
 import { logoutUserService } from '../../services/auth/authService';
 import { signupUserService } from '../../services/auth/authService';
+import { PrismaEnums } from '@/enumWrapper';
 export async function signupUser(params: {
   email: string;
   password: string;
@@ -9,10 +10,16 @@ export async function signupUser(params: {
   lastName: string;
   dob: string;
   phoneNumber: string;
+  role: (typeof PrismaEnums.UserRole)[keyof typeof PrismaEnums.UserRole];
 }) {
   return await signupUserService(params);
 }
-export async function loginUser(params: { email: string; password: string; userAgent?: string }) {
+export async function loginUser(params: {
+  email: string;
+  password: string;
+  userAgent?: string;
+  setCookie?: (name: string, value: string, options?: any) => void;
+}) {
   return await loginUserService(params);
 }
 export async function logoutUser(params: { userId: string; sessionId: string }) {

@@ -41,6 +41,8 @@ model User {
 
   isVerified    Boolean  @default(false)
   verifiedAt    DateTime?
+  JWtToken      String?
+  JwtIssuedAt  DateTime?
 
   sessions      Session[]
   wallet        PointsWallet?

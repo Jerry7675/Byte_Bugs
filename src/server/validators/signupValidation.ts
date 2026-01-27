@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { PrismaEnums } from '../../enumWrapper';
 
 const signupSchema = yup.object({
   email: yup.string().email().required(),
@@ -8,6 +9,7 @@ const signupSchema = yup.object({
   lastName: yup.string().required(),
   dob: yup.string().required(),
   phoneNumber: yup.string().required(),
+  role: yup.string().oneOf(['ADMIN', 'STARTUP', 'INVESTOR']).required(),
 });
 
 export async function validateSignup(data: {
@@ -18,6 +20,7 @@ export async function validateSignup(data: {
   lastName: string;
   dob: string;
   phoneNumber: string;
+  role: PrismaEnums.UserRole;
 }) {
   try {
     await signupSchema.validate(data);

@@ -15,6 +15,18 @@ export class ForgotPasswordService {
     await forgotPasswordRequestSchema.validate({ email });
     return prisma.user.findUnique({ where: { email } });
   }
+  static async saveResetToken(userId: string, token: string) {
+    await prisma.user.update({ where: { id: userId }, data: { JWtToken: token } });
+  }
+
+  static async isResetTokenValid(userId: string, token: string) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    return user?.JWtToken === token;
+  }
+
+  static async clearResetToken(userId: string) {
+    await prisma.user.update({ where: { id: userId }, data: { JWtToken: null } });
+  }
 
   static async createOrUpdateOTP(
     email: string,
@@ -39,7 +51,7 @@ export class ForgotPasswordService {
       data: { userId: user.id, hashedOtp, expiresAt, attempts },
     });
   }
-  // Resend OTP logic
+  // Resend OTP
   static async resendOTP(email: string, expiresInMinutes = 10) {
     await emailSchema.validate({ email });
     const user = await prisma.user.findUnique({ where: { email } });
@@ -71,7 +83,6 @@ export class ForgotPasswordService {
     if (!record) return false;
     if (record.attempts >= 5) return false;
     if (record.expiresAt < new Date()) {
-      // Delete expired OTP
       await prisma.oTP.delete({ where: { userId: user.id } });
       return 'otp_expired';
     }
@@ -83,7 +94,6 @@ export class ForgotPasswordService {
       data: { attempts: { increment: 1 } },
     });
     if (!isValid) return false;
-    // Delete OTP after successful verification (only if it exists)
     const otpRecord = await prisma.oTP.findUnique({ where: { userId: user.id } });
     if (otpRecord) {
       await prisma.oTP.delete({ where: { userId: user.id } });
@@ -103,9 +113,7 @@ export class ForgotPasswordService {
 
   static async updatePassword(token: string, password: string) {
     await passwordResetSchema.validate({ token, password });
-    // Find user by token (implement your token logic here)
-    // For demo, assume token is userId
-    const userId = token; // Replace with actual token lookup
+    const userId = token;
     const salt = process.env.APP_SALT || '';
     const hashedPassword = hashString(password, salt);
     await prisma.user.update({ where: { id: userId }, data: { password: hashedPassword } });

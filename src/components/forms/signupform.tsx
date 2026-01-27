@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signupSchema } from './validation/signupValidation';
 import HomeIcon from '@/components/common/HomeIcon';
+import { PrismaEnums } from '@/enumWrapper';
 
 export default function SignupForm() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function SignupForm() {
   const [result, setResult] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [dirty, setDirty] = useState<{ [key: string]: boolean }>({});
-
+  const [role, setRole] = useState<keyof typeof PrismaEnums.UserRole>('STARTUP');
   const validateField = async (field: string, value: string) => {
     try {
       if (field === 'confirmPassword') {
@@ -43,6 +44,7 @@ export default function SignupForm() {
         lastName,
         dob,
         phoneNumber,
+        role,
         [field]: value,
       });
       setErrors((prev) => ({ ...prev, [field]: '' }));
@@ -74,7 +76,7 @@ export default function SignupForm() {
     const fieldErrors: { [key: string]: string } = {};
     try {
       await signupSchema.validate(
-        { email, password, firstName, middleName, lastName, dob, phoneNumber },
+        { email, password, firstName, middleName, lastName, dob, phoneNumber, role },
         { abortEarly: false },
       );
       if (password !== confirmPassword) {
@@ -112,6 +114,7 @@ export default function SignupForm() {
         lastName,
         dob,
         phoneNumber,
+        role: PrismaEnums.UserRole[role],
       });
       if (success) {
         setResult('Signup successful!');
