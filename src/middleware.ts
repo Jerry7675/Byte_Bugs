@@ -1,4 +1,3 @@
-// src/middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { JwtService, JwtPayload } from './server/lib/jwt.service';
 
@@ -12,16 +11,18 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  let accessToken: string | null = null;
+  let payload: JwtPayload | null = null;
+
+  // Try to get access token from Authorization header
   const authHeader = req.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    accessToken = authHeader.slice(7);
+    payload = JwtService.verify(accessToken);
   }
 
-  const token = authHeader.slice(7);
-  const payload: JwtPayload | null = JwtService.verify(token);
-
   if (!payload) {
-    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   // Pass payload via custom headers for downstream routes
