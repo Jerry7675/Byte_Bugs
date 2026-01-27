@@ -1,8 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { AuthProvider, useAuth } from '@/context/authContext';
-
+import { useAuth } from '@/context/authContext';
 import { useEffect } from 'react';
 
 function RoleAdaptiveLayout({ children }: { children: React.ReactNode }) {
@@ -104,9 +103,5 @@ function RoleAdaptiveLayout({ children }: { children: React.ReactNode }) {
 }
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <AuthProvider requireAuth>
-      <RoleAdaptiveLayout>{children}</RoleAdaptiveLayout>
-    </AuthProvider>
-  );
+  return <RoleAdaptiveLayout>{children}</RoleAdaptiveLayout>;
 }
