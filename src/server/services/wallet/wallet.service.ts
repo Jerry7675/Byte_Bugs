@@ -49,52 +49,49 @@ export class WalletService {
     if (!transactionId && !reference) throw new Error('transactionId or reference required');
     const { prisma } = getContext();
 
-    return await prisma.$transaction(async (tx) => {
-      //Find transaction by id or reference
-      const transaction = await tx.pointsTransaction.findFirst({
-        where: {
-          ...(transactionId ? { id: transactionId } : {}),
-          ...(reference ? { reference } : {}),
-        },
-      });
-      if (!transaction) throw new Error('Transaction not found');
-      if (transaction.status !== 'pending') throw new Error('Transaction not pending');
+    const transaction = await prisma.pointsTransaction.findFirst({
+      where: {
+        ...(transactionId ? { id: transactionId } : {}),
+        ...(reference ? { reference } : {}),
+      },
+    });
+    if (!transaction) throw new Error('Transaction not found');
+    if (transaction.status !== 'pending') throw new Error('Transaction not pending');
 
-      //Lock wallet row for update
-      const wallet = await tx.pointsWallet.findUnique({ where: { id: transaction.walletId } });
-      if (!wallet) throw new Error('Wallet not found');
+    //Lock wallet row for update
+    const wallet = await prisma.pointsWallet.findUnique({ where: { id: transaction.walletId } });
+    if (!wallet) throw new Error('Wallet not found');
 
-      const balanceBefore = wallet.balance;
-      const balanceAfter = wallet.balance + transaction.amount;
+    const balanceBefore = wallet.balance;
+    const balanceAfter = wallet.balance + transaction.amount;
 
-      //Update wallet balance
-      await tx.pointsWallet.update({
-        where: { id: wallet.id },
-        data: { balance: balanceAfter },
-      });
+    //Update wallet balance
+    await prisma.pointsWallet.update({
+      where: { id: wallet.id },
+      data: { balance: balanceAfter },
+    });
 
-      //Update transaction: mark as success, store before/after
-      const updatedTx = await tx.pointsTransaction.update({
-        where: { id: transaction.id },
-        data: {
-          status: 'success',
-          note: 'Mock payment confirmed',
-          balanceBefore,
-          balanceAfter,
-        },
-      });
-
-      return {
-        status: updatedTx.status,
-        transactionId: updatedTx.id,
-        reference: updatedTx.reference,
-        amount: updatedTx.amount,
-        walletId: wallet.id,
+    //Update transaction: mark as success, store before/after
+    const updatedTx = await prisma.pointsTransaction.update({
+      where: { id: transaction.id },
+      data: {
+        status: 'success',
+        note: 'Mock payment confirmed',
         balanceBefore,
         balanceAfter,
-        confirmedAt: updatedTx.createdAt,
-      };
+      },
     });
+
+    return {
+      status: updatedTx.status,
+      transactionId: updatedTx.id,
+      reference: updatedTx.reference,
+      amount: updatedTx.amount,
+      walletId: wallet.id,
+      balanceBefore,
+      balanceAfter,
+      confirmedAt: updatedTx.createdAt,
+    };
   }
   /**
    * Mark a mock payment as failed (never delete, never mutate balances directly).

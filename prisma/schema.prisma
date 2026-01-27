@@ -14,6 +14,19 @@ enum UserRole {
   ADMIN
 }
 
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum PostCategory {
+  FINTECH
+  HEALTH
+  AI
+  OTHER
+}
+
 enum PointsTxType {
   PURCHASE
   SPEND
@@ -63,6 +76,9 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
+    verificationApplications VerificationApplication[]
+    posts                    Post[]
+    reviewedVerifications    VerificationApplication[] @relation("VerificationReviewer")
 }
 
 model Session {
@@ -189,21 +205,45 @@ model Review {
   comment     String?
 
   createdAt   DateTime @default(now())
-
-  @@unique([reviewerId, revieweeId])
+  isVerified    Boolean  @default(false)
+  verifiedAt    DateTime?
 }
 
 model Promotion {
   id          String @id @default(uuid())
   user        User   @relation(fields: [userId], references: [id])
   userId      String
-
   pointsSpent Int
   startsAt    DateTime
   endsAt      DateTime
   isActive    Boolean @default(true)
-
   createdAt   DateTime @default(now())
+}
+
+model VerificationApplication {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  status      VerificationStatus @default(PENDING)
+  companyName String?
+  domain      String?
+  documents   String? // comma-separated links or JSON
+  appliedAt   DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewerId  String?
+  reviewer    User?    @relation("VerificationReviewer", fields: [reviewerId], references: [id])
+  note        String?
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    String
+  title       String
+  content     String
+  category    PostCategory
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Category {
