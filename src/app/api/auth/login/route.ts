@@ -13,7 +13,7 @@ export async function POST(req: Request) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-
+    console.log('Login result:', result);
     // Only send user info in body, set accessToken as header
     const { accessToken, user } = result;
     const responseHeaders = new Headers({

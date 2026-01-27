@@ -1,4 +1,4 @@
-import { Button } from '@/src/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { ArrowRight, Rocket, TrendingUp } from 'lucide-react';
 
 const HeroSection = () => {
@@ -11,7 +11,7 @@ const HeroSection = () => {
           className="absolute bottom-20 right-10 w-96 h-96 bg-green-700/20 rounded-full blur-3xl animate-float"
           style={{ animationDelay: '-3s' }}
         />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-green-300/20 to-transparent rounded-full" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 bg-gradient-radial from-green-300/20 to-transparent rounded-full" />
       </div>
 
       <div className="container mx-auto px-4">

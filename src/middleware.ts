@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { JwtService, JwtPayload } from './server/lib/jwt.service';
 
-const PUBLIC_ROUTES = ['/api/auth/login', '/api/swagger', '/api/docs'];
+const PUBLIC_ROUTES = ['/api/auth/login', '/api/auth/signup'];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

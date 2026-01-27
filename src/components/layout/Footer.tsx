@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Linkedin, Twitter, Facebook, Instagram } from 'lucide-react';
+import { LogoWithText } from '../ui/logo';
 
 const Footer = () => {
   return (
@@ -10,12 +11,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 via-green-200 to-green-500 flex items-center justify-center">
-                <span className="text-green-900 font-bold text-xl">IL</span>
-              </div>
-              <span className="font-display font-bold text-2xl text-green-900">
-                Invest<span className="text-green-600">Link</span>
-              </span>
+              <LogoWithText />
             </Link>
             <p className="text-green-800/70 mb-6 max-w-sm">
               Connecting ambitious startups with smart investors worldwide. Your journey to success

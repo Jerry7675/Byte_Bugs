@@ -1,7 +1,10 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+
 import { loginSchema } from './validation/loginValidation';
+import { loginUser } from '@/app/api/auth/login/login-user-payload';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -21,7 +24,7 @@ export default function LoginForm() {
       });
       setErrors((prev) => ({ ...prev, [field]: '' }));
     } catch (err) {
-      if (err instanceof Error && 'message' in err) {
+      if (err instanceof Error && 'message' in (err as object)) {
         setErrors((prev) => ({ ...prev, [field]: (err as Error).message }));
       }
     }
@@ -42,7 +45,7 @@ export default function LoginForm() {
       setErrors({});
     } catch (err) {
       const fieldErrors: { [key: string]: string } = {};
-      if (err && typeof err === 'object' && 'inner' in err && Array.isArray((err as any).inner)) {
+      if (err && typeof err === 'object' && 'inner' in err && Array.isArray(err as object)) {
         (err as { inner: Array<{ path?: string; message: string }> }).inner.forEach((e) => {
           if (e.path) fieldErrors[e.path] = e.message;
         });
@@ -57,21 +60,12 @@ export default function LoginForm() {
       return;
     }
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      const accessToken = res.headers.get('Authorization')?.replace('Bearer ', '');
-      if (res.ok) {
+      const result = await loginUser({ email, password });
+      if (result.accessToken) {
         setResult('Login successful!');
-        // Store token in localStorage
-        if (accessToken) {
-          localStorage.setItem('accessToken', accessToken);
-        }
+        localStorage.setItem('accessToken', result.accessToken);
       } else {
-        setResult('Error: ' + (data.error?.error || 'Unknown error'));
+        setResult('Error: ' + (result.error || 'Unknown error'));
       }
     } catch {
       setResult('Network error');
@@ -81,37 +75,37 @@ export default function LoginForm() {
   };
 
   return (
-    <main className="flex items-center justify-center w-full px-4 bg-white min-h-screen">
-      <form
-        className="flex w-full flex-col max-w-96 bg-white shadow-lg rounded-xl p-8 border border-green-100"
-        onSubmit={handleSubmit}
-      >
-        <a href="https://prebuiltui.com" className="mb-8" title="Go to PrebuiltUI">
+    <main className="flex items-center justify-center w-full min-h-screen bg-white px-2 md:px-4">
+      <div className="absolute top-4 left-4 md:top-8 md:left-8">
+        <Link href="/" title="Go to Home" className="flex items-center gap-2 group">
           <svg
-            className="size-10"
-            width="30"
-            height="33"
-            viewBox="0 0 30 33"
+            className="w-9 h-9 md:w-12 md:h-12 transition-transform group-hover:scale-105"
+            viewBox="0 0 40 40"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
+            <rect width="40" height="40" rx="12" fill="#e9f5ee" />
             <path
-              d="m8 4.55 6.75 3.884 6.75-3.885M8 27.83v-7.755L1.25 16.19m27 0-6.75 3.885v7.754M1.655 8.658l13.095 7.546 13.095-7.546M14.75 31.25V16.189m13.5 5.976V10.212a2.98 2.98 0 0 0-1.5-2.585L16.25 1.65a3.01 3.01 0 0 0-3 0L2.75 7.627a3 3 0 0 0-1.5 2.585v11.953a2.98 2.98 0 0 0 1.5 2.585l10.5 5.977a3.01 3.01 0 0 0 3 0l10.5-5.977a3 3 0 0 0 1.5-2.585"
+              d="M12 22V18L20 13L28 18V22"
               stroke="#27ae60"
-              strokeWidth="2.5"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
+            <rect x="16" y="22" width="8" height="5" rx="2" fill="#27ae60" />
           </svg>
-        </a>
-
-        <h2 className="text-4xl font-medium text-green-900">Sign in</h2>
-
-        <p className="mt-4 text-base text-green-700/90">
+          <span className="sr-only">Home</span>
+        </Link>
+      </div>
+      <form
+        className="flex w-full flex-col max-w-md md:max-w-lg bg-white shadow-lg rounded-xl p-6 md:p-10 border border-green-100"
+        onSubmit={handleSubmit}
+      >
+        <h2 className="text-3xl md:text-4xl font-medium text-green-900 text-center">Sign in</h2>
+        <p className="mt-2 md:mt-4 text-base text-green-700/90 text-center">
           Please enter email and password to access.
         </p>
-
-        <div className="mt-10">
+        <div className="mt-8 md:mt-10">
           <label className="font-medium text-green-900">Email</label>
           <input
             placeholder="Please enter your email"

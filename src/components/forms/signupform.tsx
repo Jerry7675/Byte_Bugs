@@ -1,9 +1,13 @@
 'use client';
+import { signupUser } from '@/app/api/auth/signup/signup-user-payload';
 import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signupSchema } from './validation/signupValidation';
 
 export default function SignupForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -66,7 +70,7 @@ export default function SignupForm() {
     setLoading(true);
     setResult(null);
     // Validate all fields before submit
-    let fieldErrors: { [key: string]: string } = {};
+    const fieldErrors: { [key: string]: string } = {};
     try {
       await signupSchema.validate(
         { email, password, firstName, middleName, lastName, dob, phoneNumber },
@@ -81,15 +85,15 @@ export default function SignupForm() {
         return;
       }
     } catch (err) {
-      if (err && typeof err === 'object' && 'inner' in err && Array.isArray((err as any).inner)) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'inner' in (err as Record<string, unknown>) &&
+        Array.isArray((err as { inner: Array<{ path?: string; message: string }> }).inner)
+      ) {
         (err as { inner: Array<{ path?: string; message: string }> }).inner.forEach((e) => {
           if (e.path) fieldErrors[e.path] = e.message;
         });
-        (err as { inner: Array<{ path?: string; message: string }> }).inner.forEach(
-          (e: { path?: string; message: string }) => {
-            if (e.path) fieldErrors[e.path] = e.message;
-          },
-        );
       }
       if (password !== confirmPassword) {
         fieldErrors.confirmPassword = 'Passwords do not match';
@@ -99,24 +103,22 @@ export default function SignupForm() {
       return;
     }
     try {
-      const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          firstName,
-          middleName,
-          lastName,
-          dob,
-          phoneNumber,
-        }),
+      const { error } = await signupUser({
+        email,
+        password,
+        firstName,
+        middleName,
+        lastName,
+        dob,
+        phoneNumber,
       });
-      const data = await res.json();
-      if (res.ok) {
+      if (!error) {
         setResult('Signup successful!');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1200);
       } else {
-        setResult('Error: ' + (data.error?.error || 'Unknown error'));
+        setResult('Error: ' + error);
       }
     } catch (err) {
       setResult('Network error');
@@ -126,16 +128,40 @@ export default function SignupForm() {
   };
 
   return (
-    <main className="flex items-center justify-center w-full px-4 bg-white min-h-screen">
+    <main
+      className="flex items-center justify-center w-full min-h-screen bg-white px-2 md:px-4"
+      style={{ overflow: 'hidden' }}
+    >
+      <div className="absolute top-4 left-4 md:top-8 md:left-8">
+        <Link href="/" title="Go to Home" className="flex items-center gap-2 group">
+          <svg
+            className="w-9 h-9 md:w-12 md:h-12 transition-transform group-hover:scale-105"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="40" height="40" rx="12" fill="#e9f5ee" />
+            <path
+              d="M12 22V18L20 13L28 18V22"
+              stroke="#27ae60"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <rect x="16" y="22" width="8" height="5" rx="2" fill="#27ae60" />
+          </svg>
+          <span className="sr-only">Home</span>
+        </Link>
+      </div>
       <form
-        className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-8 border border-green-100"
+        className="w-full flex flex-col max-w-lg md:max-w-3xl bg-white shadow-lg rounded-xl p-2 md:p-4 border border-green-100"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-4xl font-medium text-green-900">Sign up</h2>
-        <p className="mt-4 text-base text-green-700/90">
+        <h2 className="text-3xl md:text-4xl font-medium text-green-900 text-center">Sign up</h2>
+        <p className="mt-2 md:mt-4 text-base text-green-700/90 text-center">
           Please enter your details to create an account.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 md:mt-10">
           <div>
             <label className="font-medium text-green-900">First Name</label>
             <input
