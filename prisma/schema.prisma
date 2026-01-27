@@ -99,6 +99,9 @@ model PointsTransaction {
   type      PointsTxType
   reference String?       // payment id / conversation id
   note      String?
+  status    String        @default("pending") // pending, success, failed
+  balanceBefore Int?
+  balanceAfter  Int?
 
   createdAt DateTime @default(now())
 }

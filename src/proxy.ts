@@ -4,8 +4,6 @@ import { JwtService, JwtPayload } from './server/lib/jwt.service';
 const PUBLIC_ROUTES = [
   '/api/auth/login',
   '/api/auth/signup',
-  '/api/swagger',
-  '/api/docs',
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
   '/api/auth/otp',
@@ -34,7 +32,7 @@ export async function proxy(req: NextRequest) {
 
   // Pass payload via custom headers for downstream routes
   const response = NextResponse.next();
-  response.headers.set('x-user-id', payload.userId);
+  response.headers.set('x-user-id', payload.id);
   if (payload.role) response.headers.set('x-user-role', payload.role);
 
   return response;

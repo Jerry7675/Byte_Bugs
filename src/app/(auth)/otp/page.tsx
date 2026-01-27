@@ -3,9 +3,9 @@ import OTPForm from '@/components/forms/OTPForm';
 import HomeIcon from '@/components/common/HomeIcon';
 import Link from 'next/dist/client/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 
-export default function OTPPage() {
+function OTPPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const email = searchParams.get('email') || '';
@@ -34,5 +34,13 @@ export default function OTPPage() {
         <OTPForm email={email} />
       </div>
     </main>
+  );
+}
+
+export default function OTPPageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <OTPPage />
+    </Suspense>
   );
 }

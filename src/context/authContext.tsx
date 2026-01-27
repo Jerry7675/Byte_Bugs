@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
-  user: { id: string; role: string } | null;
+  user: { id: string; role: string; email: string } | null;
   loading: boolean;
   logout: () => void;
 }
@@ -21,7 +21,7 @@ export function AuthProvider({
   children: ReactNode;
   requireAuth?: boolean;
 }) {
-  const [user, setUser] = useState<{ id: string; role: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; role: string; email: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -34,8 +34,8 @@ export function AuthProvider({
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        if (decoded && decoded.sub && decoded.role) {
-          setUser({ id: decoded.sub, role: decoded.role });
+        if (decoded && decoded.id && decoded.role && decoded.email) {
+          setUser({ id: decoded.id, email: decoded.email, role: decoded.role });
         } else {
           setUser(null);
         }

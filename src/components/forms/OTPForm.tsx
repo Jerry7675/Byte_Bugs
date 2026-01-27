@@ -1,6 +1,7 @@
 // Accept email as a prop (from parent, e.g. forgot password page)
 import { useState } from 'react';
 import { verifyOtp } from '@/client/api/otp-api';
+import { resendOtp } from '@/client/api/resend-otp-api';
 import { useRouter } from 'next/navigation';
 
 export default function OTPForm({ email }: { email: string }) {
@@ -45,12 +46,7 @@ export default function OTPForm({ email }: { email: string }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/auth/forgotPassword', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, resend: true }),
-      });
-      const data = await res.json();
+      const data = await resendOtp({ email });
       if (data.error) {
         setError(data.error);
       } else {
