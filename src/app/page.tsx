@@ -1,10 +1,9 @@
-import Image from 'next/image';
+import HeroSection from '@/src/components/home/Hero';
 
-export default function Home() {
+export default function HomePage() {
   return (
     <div>
-      <h1>Welcome to Our Website</h1>
-      <p>This is the home page of our awesome Next.js application.</p>
+      <HeroSection />
     </div>
   );
 }
