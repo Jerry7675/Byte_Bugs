@@ -1,12 +1,12 @@
-import { validateLogout } from '../validators/logoutValidation';
-import { prismaService } from '../../lib/prisma.service';
-import { validateLogin } from '../validators/loginValidation';
-import { JwtService } from '../lib/jwt.service';
+import { validateLogout } from '../../validators/logoutValidation';
+import { prismaService } from '../../../lib/prisma.service';
+import { validateLogin } from '../../validators/loginValidation';
+import { JwtService } from '../../lib/jwt.service';
 import { addMinutes } from 'date-fns';
-import { generateSalt, hashString } from '../lib/hash.service';
-import { validateSignup } from '../validators/signupValidation';
-import { PrismaEnums } from '../../enumWrapper';
-import { logger } from '../lib/logger';
+import { generateSalt, hashString } from '../../lib/hash.service';
+import { validateSignup } from '../../validators/signupValidation';
+import { PrismaEnums } from '../../../enumWrapper';
+import { logger } from '../../lib/logger';
 
 export async function signupUserService(params: {
   email: string;

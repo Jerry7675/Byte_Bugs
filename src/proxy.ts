@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { JwtService, JwtPayload } from './server/lib/jwt.service';
 
-const PUBLIC_ROUTES = ['/api/auth/login', '/api/auth/signup', '/api/swagger', '/api/docs'];
+const PUBLIC_ROUTES = [
+  '/api/auth/login',
+  '/api/auth/signup',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;

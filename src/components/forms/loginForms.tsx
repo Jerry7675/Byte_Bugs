@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import { loginSchema } from './validation/loginValidation';
-import { loginUser } from '@/app/api/auth/login/login-user-payload';
+import { loginUser } from '@/client/api/login-user-payload';
 import HomeIcon from '@/components/common/HomeIcon';
 
 export default function LoginForm() {

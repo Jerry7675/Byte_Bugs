@@ -1,5 +1,5 @@
 'use client';
-import { signupUser } from '@/app/api/auth/signup/signup-user-payload';
+import { signupUser } from '@/client/api/signup-user-payload';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -134,10 +134,10 @@ export default function SignupForm() {
       style={{ overflow: 'hidden' }}
     >
       <div className="absolute top-4 left-4 md:top-8 md:left-8">
-        <a href="/" title="Go to Home" className="flex items-center gap-2 group">
+        <Link href="/" title="Go to Home" className="flex items-center gap-2 group">
           <HomeIcon className="w-9 h-9 md:w-12 md:h-12 transition-transform group-hover:scale-105" />
           <span className="sr-only">Home</span>
-        </a>
+        </Link>
       </div>
       <form
         className="w-full flex flex-col max-w-lg md:max-w-3xl bg-white shadow-lg rounded-xl p-2 md:p-4 border border-green-100"
