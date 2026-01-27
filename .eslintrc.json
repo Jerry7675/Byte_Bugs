@@ -1,0 +1,8 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript", "plugin:prettier/recommended"],
+  "rules": {
+    "prettier/prettier": "error",
+    "no-console": "warn",
+    "react/jsx-key": "error"
+  }
+}
