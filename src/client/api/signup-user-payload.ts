@@ -1,3 +1,4 @@
+import { PrismaEnums } from '../../enumWrapper';
 export interface SignupPayload {
   email: string;
   password: string;
@@ -6,6 +7,7 @@ export interface SignupPayload {
   lastName: string;
   dob: string;
   phoneNumber: string;
+  role: (typeof PrismaEnums.UserRole)[keyof typeof PrismaEnums.UserRole];
 }
 
 export interface SignupResponse {

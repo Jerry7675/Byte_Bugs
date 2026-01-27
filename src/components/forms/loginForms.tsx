@@ -1,13 +1,14 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import { loginSchema } from './validation/loginValidation';
 import { loginUser } from '@/client/api/login-user-payload';
 import HomeIcon from '@/components/common/HomeIcon';
-
 export default function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -62,9 +63,9 @@ export default function LoginForm() {
     }
     try {
       const result = await loginUser({ email, password });
-      if (result.accessToken) {
+      if (result.success) {
         setResult('Login successful!');
-        localStorage.setItem('accessToken', result.accessToken);
+        router.push('/dashboard');
       } else {
         setResult('Error: ' + (result.error || 'Unknown error'));
       }

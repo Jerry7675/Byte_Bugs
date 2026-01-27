@@ -2,8 +2,22 @@
 import OTPForm from '@/components/forms/OTPForm';
 import HomeIcon from '@/components/common/HomeIcon';
 import Link from 'next/dist/client/link';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function OTPPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const email = searchParams.get('email') || '';
+
+  useEffect(() => {
+    if (!email) {
+      router.replace('/forgot-password');
+    }
+  }, [email, router]);
+
+  if (!email) return null;
+
   return (
     <main className="flex items-center justify-center w-full min-h-screen bg-white px-2 md:px-4">
       <div className="absolute top-4 left-4 md:top-8 md:left-8">
@@ -17,7 +31,7 @@ export default function OTPPage() {
         <p className="mt-2 text-base text-green-700/90 text-center">
           Please enter the OTP sent to your email.
         </p>
-        <OTPForm />
+        <OTPForm email={email} />
       </div>
     </main>
   );

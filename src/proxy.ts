@@ -4,8 +4,11 @@ import { JwtService, JwtPayload } from './server/lib/jwt.service';
 const PUBLIC_ROUTES = [
   '/api/auth/login',
   '/api/auth/signup',
+  '/api/swagger',
+  '/api/docs',
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
+  '/api/auth/otp',
 ];
 
 export async function proxy(req: NextRequest) {

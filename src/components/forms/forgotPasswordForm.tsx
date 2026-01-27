@@ -20,7 +20,7 @@ export default function ForgotPasswordForm() {
       if (res.message) {
         setResult(res.message);
         setTimeout(() => {
-          router.push('/otp');
+          router.push(`/otp?email=${encodeURIComponent(email)}`);
         }, 800);
       } else {
         setError(res.error || 'Unknown error');

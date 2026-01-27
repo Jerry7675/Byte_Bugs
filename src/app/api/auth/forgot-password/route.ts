@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ForgotPasswordService } from '@/server/services/forgotPasswordService';
+import { ForgotPasswordService } from '@/server/services/auth/forgotPasswordService';
 import { sendMail } from '@/server/lib/mailHandler';
 
 export async function POST(req: NextRequest) {
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    await ForgotPasswordService.createOrUpdateOTP(user.id, generatedOtp);
+    await ForgotPasswordService.createOrUpdateOTP(user.email, generatedOtp);
     await sendMail({
       to: email,
       subject: 'Your OTP for Password Reset',

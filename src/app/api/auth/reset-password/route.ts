@@ -17,7 +17,13 @@ export async function POST(req: NextRequest) {
       console.error('JWT error:', err);
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
     }
+    // Check if token exists in user table
+    const valid = await ForgotPasswordService.isResetTokenValid(payload.userId, token);
+    if (!valid) {
+      return NextResponse.json({ error: 'Token already used or expired' }, { status: 400 });
+    }
     await ForgotPasswordService.updatePassword(payload.userId, password);
+    await ForgotPasswordService.clearResetToken(payload.userId);
     return NextResponse.json({ message: 'Password updated successfully' });
   } catch (err) {
     console.error('Reset password error:', err);
