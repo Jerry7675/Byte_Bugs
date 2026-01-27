@@ -4,8 +4,9 @@ const SECRET: string = process.env.JWT_SECRET;
 const DEFAULT_EXPIRATION = '1h';
 
 export interface JwtPayload {
-  userId: string;
+  id: string;
   role?: string;
+  email?: string;
   data?: Record<string, unknown>;
 }
 

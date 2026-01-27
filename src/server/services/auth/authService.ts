@@ -1,5 +1,4 @@
 import { validateLogout } from '../../validators/logoutValidation';
-import { prismaService } from '../../../lib/prisma.service';
 import { validateLogin } from '../../validators/loginValidation';
 import { JwtService } from '../../lib/jwt.service';
 import { addMinutes } from 'date-fns';
@@ -7,6 +6,7 @@ import { hashString } from '../../lib/hash.service';
 import { validateSignup } from '../../validators/signupValidation';
 import { PrismaEnums } from '../../../enumWrapper';
 import { logger } from '../../lib/logger';
+import { getContext } from '@/context/context-store';
 
 export async function signupUserService(params: {
   email: string;
@@ -33,7 +33,7 @@ export async function signupUserService(params: {
     logger.warn('Signup validation failed', { error: valid.error });
     return { error: valid.error };
   }
-  const prisma = prismaService.getClient();
+  const { prisma } = getContext();
   try {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -94,7 +94,7 @@ export async function loginUserService(params: {
     logger.warn('Login validation failed', { error: valid.error });
     return { error: valid.error };
   }
-  const prisma = prismaService.getClient();
+  const { prisma } = getContext();
   try {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -125,7 +125,7 @@ export async function loginUserService(params: {
     const AccessTokenExpiryMinutes = 60;
 
     // Generate access token only
-    const accessToken = JwtService.sign({ userId: user.id, role: user.role });
+    const accessToken = JwtService.sign({ id: user.id, email: user.email, role: user.role });
     const accessTokenExpiresAt = addMinutes(new Date(), AccessTokenExpiryMinutes); // 1 hour for access token
 
     // Store session
@@ -141,7 +141,7 @@ export async function loginUserService(params: {
     // Set the access token in an HTTP-only cookie if setCookie is provided
     if (typeof setCookie === 'function') {
       setCookie('accessToken', accessToken, {
-        httpOnly: true,
+        httpOnly: false,
         secure: false, // fasle as we are using in dev , i.e http
         sameSite: 'lax',
         path: '/',
@@ -172,7 +172,7 @@ export async function logoutUserService(params: { userId: string; sessionId: str
     logger.warn('Logout validation failed', { error: valid.error });
     return { error: valid.error };
   }
-  const prisma = prismaService.getClient();
+  const { prisma } = getContext();
   try {
     // Destroy the session
     await prisma.session.delete({

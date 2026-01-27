@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useSearchParams } from 'next/navigation';
 import ImageUploader from '@/components/common/ImageUploader';
 
@@ -24,30 +23,19 @@ export default function ProfileForm({ userRole, userId }: { userRole: string; us
 
   const fetchProfile = async () => {
     try {
-      // Find valid profile via API - we might need to filter by userId or let API handle it via user context if we had it
-      // Since API requires role and id (profileId) strictly in current route.ts, filtering by userId is tricky if we don't know profileId.
-      // However, current route.ts GET /api/profile?role=... returns ALL profiles or by ID.
-      // We actually need an endpoint to get "my profile".
-      // For MVP, let's assume we can GET /api/profile?role=...&userId=... if we update API or
-      // we filter client side (not secure but okay for MVP) OR we update route.ts to support userId query.
-      // Let's assume we update logic to fetch by User ID or we construct it.
-      // Wait, let's fetch all and find ours for MVP speed.
-
-      const response = await axios.get(`/api/profile?role=${userRole}`);
-      const profiles = response.data;
-      if (Array.isArray(profiles)) {
-        const myProfile = profiles.find((p: any) => p.userId === userId);
-        if (myProfile) {
-          setProfile(myProfile);
-          setFormData(myProfile);
-        } else {
-          // No profile yet, initialize empty
-          setFormData({ userId });
-        }
+      const res = await fetch(`/api/profile?role=${userRole}&userId=${userId}`);
+      const data = await res.json();
+      const myProfile = data && !Array.isArray(data) ? data : null;
+      if (myProfile && myProfile.userId === userId) {
+        setProfile(myProfile);
+        setFormData(myProfile);
+      } else {
+        setProfile(null);
+        setFormData({ userId });
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.error('Error fetching profile');
+      setProfile(null);
+      setFormData({ userId });
     } finally {
       setLoading(false);
     }
@@ -70,18 +58,28 @@ export default function ProfileForm({ userRole, userId }: { userRole: string; us
 
     try {
       const payload = { ...formData, role: userRole };
-
-      if (profile?.id) {
-        // Update
-        await axios.put('/api/profile', { id: profile.id, ...payload });
+      let res;
+      if (profile && profile.id) {
+        //Update
+        res = await fetch('/api/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: profile.id, ...payload }),
+        });
       } else {
-        // Create
-        await axios.post('/api/profile', payload);
+        //Create
+        res = await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
       }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save profile');
       setMessage({ type: 'success', text: 'Profile saved successfully!' });
-      fetchProfile(); // Refresh
+      fetchProfile();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.response?.data?.error || 'Failed to save profile' });
+      setMessage({ type: 'error', text: err.message || 'Failed to save profile' });
     } finally {
       setSaving(false);
     }

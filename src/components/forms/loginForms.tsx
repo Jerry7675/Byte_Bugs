@@ -65,7 +65,7 @@ export default function LoginForm() {
       const result = await loginUser({ email, password });
       if (result.success) {
         setResult('Login successful!');
-        router.push('/dashboard');
+        router.push('/profile ');
       } else {
         setResult('Error: ' + (result.error || 'Unknown error'));
       }

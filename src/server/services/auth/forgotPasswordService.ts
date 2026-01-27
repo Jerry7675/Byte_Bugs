@@ -1,4 +1,3 @@
-import { prismaService } from '@/lib/prisma.service';
 import { hashString } from '../../lib/hash.service';
 import { User } from '@/lib/prisma.type';
 import {
@@ -8,23 +7,25 @@ import {
   emailSchema,
 } from '../../validators';
 
-const prisma = prismaService.getClient();
-
+import { getContext } from '@/context/context-store';
 export class ForgotPasswordService {
   static async findUserByEmail(email: string): Promise<User | null> {
     await forgotPasswordRequestSchema.validate({ email });
+    const { prisma } = getContext();
     return prisma.user.findUnique({ where: { email } });
   }
   static async saveResetToken(userId: string, token: string) {
+    const { prisma } = getContext();
     await prisma.user.update({ where: { id: userId }, data: { JWtToken: token } });
   }
-
   static async isResetTokenValid(userId: string, token: string) {
+    const { prisma } = getContext();
     const user = await prisma.user.findUnique({ where: { id: userId } });
     return user?.JWtToken === token;
   }
-
   static async clearResetToken(userId: string) {
+    const { prisma } = getContext();
+    await prisma.user.update({ where: { id: userId }, data: { JWtToken: null } });
     await prisma.user.update({ where: { id: userId }, data: { JWtToken: null } });
   }
 
@@ -34,7 +35,7 @@ export class ForgotPasswordService {
     expiresInMinutes = 10,
     attemptsOverride?: number,
   ) {
-    await emailSchema.validate({ email });
+    const { prisma } = getContext();
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error('User not found');
     const salt = process.env.APP_SALT || '';
@@ -53,7 +54,7 @@ export class ForgotPasswordService {
   }
   // Resend OTP
   static async resendOTP(email: string, expiresInMinutes = 10) {
-    await emailSchema.validate({ email });
+    const { prisma } = getContext();
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error('User not found');
     const existing = await prisma.oTP.findUnique({ where: { userId: user.id } });
@@ -76,7 +77,7 @@ export class ForgotPasswordService {
   }
 
   static async verifyOTP(email: string, otp: string) {
-    await otpVerifySchema.validate({ email, otp });
+    const { prisma } = getContext();
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return false;
     const record = await prisma.oTP.findUnique({ where: { userId: user.id } });
@@ -102,7 +103,7 @@ export class ForgotPasswordService {
   }
 
   static async clearOTP(email: string) {
-    await emailSchema.validate({ email });
+    const { prisma } = getContext();
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return;
     const otpRecord = await prisma.oTP.findUnique({ where: { userId: user.id } });
@@ -112,6 +113,7 @@ export class ForgotPasswordService {
   }
 
   static async updatePassword(token: string, password: string) {
+    const { prisma } = getContext();
     await passwordResetSchema.validate({ token, password });
     const userId = token;
     const salt = process.env.APP_SALT || '';

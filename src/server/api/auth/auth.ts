@@ -1,6 +1,6 @@
-import { loginUserService } from '../../services/auth/authService';
-import { logoutUserService } from '../../services/auth/authService';
-import { signupUserService } from '../../services/auth/authService';
+import { loginUserService } from '@/server/services/auth/authService';
+import { logoutUserService } from '@/server/services/auth/authService';
+import { signupUserService } from '@/server/services/auth/authService';
 import { PrismaEnums } from '@/enumWrapper';
 export async function signupUser(params: {
   email: string;
