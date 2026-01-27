@@ -1,8 +1,6 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
-
 if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET not defined');
 const SECRET: string = process.env.JWT_SECRET;
-
 const DEFAULT_EXPIRATION = '1h';
 
 export interface JwtPayload {
