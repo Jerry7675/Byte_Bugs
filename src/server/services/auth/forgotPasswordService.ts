@@ -82,7 +82,10 @@ export class ForgotPasswordService {
     if (!user) return false;
     const record = await prisma.oTP.findUnique({ where: { userId: user.id } });
     if (!record) return false;
-    if (record.attempts >= 5) return false;
+    if (record.attempts >= 5) {
+      await prisma.oTP.delete({ where: { userId: user.id } });
+      return false
+    };
     if (record.expiresAt < new Date()) {
       await prisma.oTP.delete({ where: { userId: user.id } });
       return 'otp_expired';
