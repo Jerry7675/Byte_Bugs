@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signupSchema } from './validation/signupValidation';
+import HomeIcon from '@/components/common/HomeIcon';
 
 export default function SignupForm() {
   const router = useRouter();
@@ -103,7 +104,7 @@ export default function SignupForm() {
       return;
     }
     try {
-      const { error } = await signupUser({
+      const { success, error } = await signupUser({
         email,
         password,
         firstName,
@@ -112,11 +113,11 @@ export default function SignupForm() {
         dob,
         phoneNumber,
       });
-      if (!error) {
+      if (success) {
         setResult('Signup successful!');
         setTimeout(() => {
           router.push('/login');
-        }, 1200);
+        }, 400);
       } else {
         setResult('Error: ' + error);
       }
@@ -133,25 +134,10 @@ export default function SignupForm() {
       style={{ overflow: 'hidden' }}
     >
       <div className="absolute top-4 left-4 md:top-8 md:left-8">
-        <Link href="/" title="Go to Home" className="flex items-center gap-2 group">
-          <svg
-            className="w-9 h-9 md:w-12 md:h-12 transition-transform group-hover:scale-105"
-            viewBox="0 0 40 40"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect width="40" height="40" rx="12" fill="#e9f5ee" />
-            <path
-              d="M12 22V18L20 13L28 18V22"
-              stroke="#27ae60"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <rect x="16" y="22" width="8" height="5" rx="2" fill="#27ae60" />
-          </svg>
+        <a href="/" title="Go to Home" className="flex items-center gap-2 group">
+          <HomeIcon className="w-9 h-9 md:w-12 md:h-12 transition-transform group-hover:scale-105" />
           <span className="sr-only">Home</span>
-        </Link>
+        </a>
       </div>
       <form
         className="w-full flex flex-col max-w-lg md:max-w-3xl bg-white shadow-lg rounded-xl p-2 md:p-4 border border-green-100"
@@ -180,9 +166,9 @@ export default function SignupForm() {
             )}
           </div>
           <div>
-            <label className="font-medium text-green-900">Middle Name</label>
+            <label className="font-medium text-green-900">Middle Name (Optional)</label>
             <input
-              placeholder="Middle Name (optional)"
+              placeholder="Middle Name "
               className="mt-2 rounded-md ring ring-green-200 focus:ring-2 focus:ring-green-400 outline-none px-3 py-3 w-full bg-green-50 text-green-900"
               type="text"
               name="middleName"
@@ -336,9 +322,9 @@ export default function SignupForm() {
           ))}
         <p className="text-center py-8 text-gray-500">
           Already have an account?{' '}
-          <a href="/login" className="text-green-600 hover:underline">
+          <Link href="/login" className="text-green-600 hover:underline">
             Login
-          </a>
+          </Link>
         </p>
       </form>
     </main>

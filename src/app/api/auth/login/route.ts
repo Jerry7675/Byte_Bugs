@@ -15,14 +15,10 @@ export async function POST(req: Request) {
     }
     console.log('Login result:', result);
     // Only send user info in body, set accessToken as header
-    const { accessToken, user } = result;
-    const responseHeaders = new Headers({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    });
+    const { user } = result;
     return new Response(JSON.stringify({ user }), {
       status: 200,
-      headers: responseHeaders,
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: 'Invalid request' }), {

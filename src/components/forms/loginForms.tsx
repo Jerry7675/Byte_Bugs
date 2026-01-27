@@ -5,6 +5,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import { loginSchema } from './validation/loginValidation';
 import { loginUser } from '@/app/api/auth/login/login-user-payload';
+import HomeIcon from '@/components/common/HomeIcon';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -78,22 +79,7 @@ export default function LoginForm() {
     <main className="flex items-center justify-center w-full min-h-screen bg-white px-2 md:px-4">
       <div className="absolute top-4 left-4 md:top-8 md:left-8">
         <Link href="/" title="Go to Home" className="flex items-center gap-2 group">
-          <svg
-            className="w-9 h-9 md:w-12 md:h-12 transition-transform group-hover:scale-105"
-            viewBox="0 0 40 40"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect width="40" height="40" rx="12" fill="#e9f5ee" />
-            <path
-              d="M12 22V18L20 13L28 18V22"
-              stroke="#27ae60"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <rect x="16" y="22" width="8" height="5" rx="2" fill="#27ae60" />
-          </svg>
+          <HomeIcon className="w-9 h-9 md:w-12 md:h-12 transition-transform group-hover:scale-105" />
           <span className="sr-only">Home</span>
         </Link>
       </div>
@@ -158,6 +144,12 @@ export default function LoginForm() {
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
+
+        <div className="mt-4 text-center">
+          <Link href="/forgot-password" className="text-green-600 hover:underline">
+            Forgot password? I gotchu
+          </Link>
+        </div>
 
         {result &&
           (result.toLowerCase().startsWith('error') ? (
