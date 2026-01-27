@@ -1,4 +1,6 @@
-import { signupUserService } from '../services/authService';
+import { loginUserService } from '../../services/auth/authService';
+import { logoutUserService } from '../../services/auth/authService';
+import { signupUserService } from '../../services/auth/authService';
 export async function signupUser(params: {
   email: string;
   password: string;
@@ -10,8 +12,6 @@ export async function signupUser(params: {
 }) {
   return await signupUserService(params);
 }
-import { loginUserService } from '../services/authService';
-import { logoutUserService } from '../services/authService';
 export async function loginUser(params: { email: string; password: string; userAgent?: string }) {
   return await loginUserService(params);
 }

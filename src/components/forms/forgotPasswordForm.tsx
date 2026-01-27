@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { forgotPassword } from '@/client/api/forgot-password-api';
 import { useRouter } from 'next/navigation';
 
 export default function ForgotPasswordForm() {
@@ -14,14 +15,16 @@ export default function ForgotPasswordForm() {
     setLoading(true);
     setResult(null);
     setError(null);
-    // Simulate API call
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setResult('OTP sent to your email!');
-      setTimeout(() => {
-        router.push('/otp');
-      }, 800);
+      const res = await forgotPassword({ email });
+      if (res.message) {
+        setResult(res.message);
+        setTimeout(() => {
+          router.push('/otp');
+        }, 800);
+      } else {
+        setError(res.error || 'Unknown error');
+      }
     } catch (err) {
       setError('Network error');
     } finally {
