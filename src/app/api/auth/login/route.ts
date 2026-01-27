@@ -1,11 +1,11 @@
-import { loginUser } from '../../../../server/api/auth';
+import { loginUser, testLogin } from '../../../../server/api/auth';
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
-    const result = await loginUser({ email, password });
-    if (result.error) {
-      return new Response(JSON.stringify({ error: result.error }), {
+    const result = await testLogin({ email, password });
+    if (result !== null && 'error' in result) {
+      return new Response(JSON.stringify({ error: result }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
