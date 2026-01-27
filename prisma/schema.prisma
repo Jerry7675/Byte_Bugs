@@ -6,31 +6,204 @@ generator client {
 datasource db {
 	provider = "postgresql"
 }
+// prisma/schema.prisma
+
+enum UserRole {
+  INVESTOR
+  STARTUP
+  ADMIN
+}
+
+enum PointsTxType {
+  PURCHASE
+  SPEND
+  REFUND
+  ADJUSTMENT
+}
+
+enum ConversationStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  CLOSED
+}
 
 model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  role          UserRole
+  firstName     String
+  middleName    String?
+  lastName      String
+  dob           DateTime
+  phoneNumber   String
+
+  isVerified    Boolean  @default(false)
+  verifiedAt    DateTime?
+
+  sessions      Session[]
+  wallet        PointsWallet?
+  investor      InvestorProfile?
+  startup       StartupProfile?
+
+  sentReviews   Review[] @relation("Reviewer")
+  receivedReviews Review[] @relation("Reviewee")
+
+  conversationsAsRequester Conversation[] @relation("Requester")
+  conversationsAsReceiver  Conversation[] @relation("Receiver")
+
+  messages      Message[]
+  promotions    Promotion[]
+  adminActions  AdminAction[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Session {
   id          String   @id @default(uuid())
-  email       String   @unique
-  role        String
-  password    String
-  firstName   String
-  middleName  String?
-  lastName    String
-  dob         DateTime
-  phoneNumber String
-  sessions    Session[]
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  accessToken String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  userAgent   String?
+  ipAddress   String?
+}
+
+model PointsWallet {
+  id        String @id @default(uuid())
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String @unique
+  balance   Int    @default(0)
+
+  transactions PointsTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PointsTransaction {
+  id        String        @id @default(uuid())
+  wallet    PointsWallet @relation(fields: [walletId], references: [id])
+  walletId  String
+  amount    Int           // +credit, -debit
+  type      PointsTxType
+  reference String?       // payment id / conversation id
+  note      String?
+
+  createdAt DateTime @default(now())
+}
+
+model InvestorProfile {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+
+  bio         String?
+  firmName    String?
+  website     String?
+  minTicket   Int?
+  maxTicket   Int?
+
+  categories  Category[] @relation("InvestorCategories")
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-model Session {
-  id                     String   @id @default(uuid())
-  user                   User     @relation(fields: [userId], references: [id])
-  userId                 String
-  accessToken            String
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-  expiresAt              DateTime
-  revokedAt              DateTime?
-  userAgent              String?
-  ipAddress              String?
+model StartupProfile {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+
+  name        String
+  description String?
+  website     String?
+  stage       String?   // idea, seed, series-a (string for MVP)
+
+  categories  Category[] @relation("StartupCategories")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Conversation {
+  id            String   @id @default(uuid())
+  requester     User     @relation("Requester", fields: [requesterId], references: [id])
+  requesterId   String
+  receiver      User     @relation("Receiver", fields: [receiverId], references: [id])
+  receiverId    String
+
+  status        ConversationStatus @default(PENDING)
+  pointsCost    Int
+
+  messages      Message[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([requesterId, receiverId])
+}
+
+model Message {
+  id             String        @id @default(uuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  sender         User          @relation(fields: [senderId], references: [id])
+  senderId       String
+  content        String
+
+  createdAt      DateTime @default(now())
+}
+
+model Review {
+  id          String @id @default(uuid())
+  reviewer    User   @relation("Reviewer", fields: [reviewerId], references: [id])
+  reviewerId  String
+  reviewee    User   @relation("Reviewee", fields: [revieweeId], references: [id])
+  revieweeId  String
+
+  rating      Int    // 1–5
+  comment     String?
+
+  createdAt   DateTime @default(now())
+
+  @@unique([reviewerId, revieweeId])
+}
+
+model Promotion {
+  id          String @id @default(uuid())
+  user        User   @relation(fields: [userId], references: [id])
+  userId      String
+
+  pointsSpent Int
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean @default(true)
+
+  createdAt   DateTime @default(now())
+}
+
+model Category {
+  id        String @id @default(uuid())
+  name      String @unique
+
+  investors InvestorProfile[] @relation("InvestorCategories")
+  startups  StartupProfile[]  @relation("StartupCategories")
+}
+
+model AdminAction {
+  id        String @id @default(uuid())
+  admin     User   @relation(fields: [adminId], references: [id])
+  adminId   String
+  action    String
+  targetId  String?
+  note      String?
+
+  createdAt DateTime @default(now())
 }

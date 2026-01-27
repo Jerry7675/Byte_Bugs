@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { JwtService, JwtPayload } from './server/lib/jwt.service';
 
-const PUBLIC_ROUTES = ['/api/auth/login', '/api/auth/signup'];
+const PUBLIC_ROUTES = ['/api/auth/login', '/api/auth/signup', '/api/swagger', '/api/docs'];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Skip auth for public routes
@@ -14,10 +14,9 @@ export async function middleware(req: NextRequest) {
   let accessToken: string | null = null;
   let payload: JwtPayload | null = null;
 
-  // Try to get access token from Authorization header
-  const authHeader = req.headers.get('authorization');
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    accessToken = authHeader.slice(7);
+  // Try to get access token from cookies
+  accessToken = req.cookies.get('accessToken')?.value || null;
+  if (accessToken) {
     payload = JwtService.verify(accessToken);
   }
 

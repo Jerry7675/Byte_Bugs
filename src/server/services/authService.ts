@@ -5,6 +5,8 @@ import { JwtService } from '../lib/jwt.service';
 import { addMinutes } from 'date-fns';
 import { generateSalt, hashString } from '../lib/hash.service';
 import { validateSignup } from '../validators/signupValidation';
+import { PrismaEnums } from '../../enumWrapper';
+import { logger } from '../lib/logger';
 
 export async function signupUserService(params: {
   email: string;
@@ -26,6 +28,7 @@ export async function signupUserService(params: {
     phoneNumber,
   });
   if (!valid.success) {
+    logger.warn('Signup validation failed', { error: valid.error });
     return { error: valid.error };
   }
   const prisma = prismaService.getClient();
@@ -33,9 +36,14 @@ export async function signupUserService(params: {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
+      logger.warn('Attempt to signup with existing user', { email });
       return { error: 'User already exists' };
     }
-    const salt = process.env.APP_SALT || generateSalt();
+    const salt = process.env.APP_SALT;
+    if (!salt) {
+      logger.error('APP_SALT is not defined in environment variables');
+      throw new Error('APP_SALT is not defined in environment variables');
+    }
     const hashedPassword = hashString(password, salt);
     const user = await prisma.user.create({
       data: {
@@ -44,7 +52,7 @@ export async function signupUserService(params: {
         firstName,
         middleName,
         lastName,
-        role: 'user',
+        role: PrismaEnums.UserRole.STARTUP,
         dob: new Date(dob),
         phoneNumber,
       },
@@ -63,21 +71,25 @@ export async function signupUserService(params: {
       },
     };
   } catch (error) {
+    logger.error('Signup error', { error });
     if (error instanceof Error) {
-      return { error: error.message };
+      return { error: error.message, success: false };
     }
     return { error: 'Unknown error' };
   }
 }
 
+// Modified to set the access token in an HTTP-only cookie
 export async function loginUserService(params: {
   email: string;
   password: string;
   userAgent?: string;
+  setCookie?: (name: string, value: string, options?: any) => void;
 }) {
-  const { email, password, userAgent } = params;
+  const { email, password, userAgent, setCookie } = params;
   const valid = await validateLogin({ email, password, userAgent });
   if (!valid.success) {
+    logger.warn('Login validation failed', { error: valid.error });
     return { error: valid.error };
   }
   const prisma = prismaService.getClient();
@@ -85,18 +97,36 @@ export async function loginUserService(params: {
     const user = await prisma.user.findUnique({
       where: { email },
     });
-    const salt = process.env.APP_SALT || '';
-    if (!user || user.password !== hashString(password, salt)) {
+    if (!user) {
+      logger.warn('Login attempt for non-existent user', { email });
+      return { error: 'User not found' };
+    }
+    const salt = process.env.APP_SALT;
+    if (!salt) {
+      logger.error('APP_SALT is not defined in environment variables');
+      throw new Error('APP_SALT is not defined in environment variables');
+    }
+    if (user.password !== hashString(password, salt)) {
+      logger.warn('Invalid login credentials', { email });
       return { error: 'Invalid credentials' };
     }
 
-    const AccessTokenExpiryMinutes = 60; // 1 hour
+    const existingSession = await prisma.session.findFirst({
+      where: { userId: user.id },
+    });
+
+    if (existingSession) {
+      await prisma.session.delete({
+        where: { id: existingSession.id },
+      });
+    }
+    const AccessTokenExpiryMinutes = 60;
 
     // Generate access token only
     const accessToken = JwtService.sign({ userId: user.id, role: user.role });
     const accessTokenExpiresAt = addMinutes(new Date(), AccessTokenExpiryMinutes); // 1 hour for access token
 
-    // Store session (no refresh token)
+    // Store session
     await prisma.session.create({
       data: {
         userId: user.id,
@@ -106,9 +136,19 @@ export async function loginUserService(params: {
       },
     });
 
+    // Set the access token in an HTTP-only cookie if setCookie is provided
+    if (typeof setCookie === 'function') {
+      setCookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: false, // fasle as we are using in dev , i.e http
+        sameSite: 'lax',
+        path: '/',
+        maxAge: AccessTokenExpiryMinutes * 60 * 2, // 2 hours for now hai
+      });
+    }
+
     return {
       success: true,
-      accessToken,
       user: {
         id: user.id,
         email: user.email,
@@ -116,6 +156,7 @@ export async function loginUserService(params: {
       },
     };
   } catch (error) {
+    logger.error('Login error', { error });
     if (error instanceof Error) {
       return { error: error.message };
     }
@@ -126,6 +167,7 @@ export async function logoutUserService(params: { userId: string; sessionId: str
   const { userId, sessionId } = params;
   const valid = await validateLogout({ userId, sessionId });
   if (!valid.success) {
+    logger.warn('Logout validation failed', { error: valid.error });
     return { error: valid.error };
   }
   const prisma = prismaService.getClient();
@@ -139,6 +181,7 @@ export async function logoutUserService(params: { userId: string; sessionId: str
     });
     return { success: true };
   } catch (error) {
+    logger.error('Logout error', { error });
     if (error instanceof Error) {
       return { error: error.message };
     }

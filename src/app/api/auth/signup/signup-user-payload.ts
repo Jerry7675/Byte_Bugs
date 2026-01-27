@@ -10,6 +10,7 @@ export interface SignupPayload {
 
 export interface SignupResponse {
   error?: string;
+  success?: boolean;
 }
 
 export async function signupUser(payload: SignupPayload): Promise<SignupResponse> {
@@ -18,10 +19,11 @@ export async function signupUser(payload: SignupPayload): Promise<SignupResponse
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      credentials: 'include', //Include cookies in the request
     });
     const data = await res.json();
     if (res.ok) {
-      return {};
+      return { success: true };
     } else {
       return { error: data.error?.error || 'Unknown error' };
     }
