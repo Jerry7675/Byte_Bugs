@@ -5,6 +5,7 @@ import { JwtService } from '../lib/jwt.service';
 import { addMinutes } from 'date-fns';
 import { generateSalt, hashString } from '../lib/hash.service';
 import { validateSignup } from '../validators/signupValidation';
+
 export async function signupUserService(params: {
   email: string;
   password: string;
@@ -34,7 +35,7 @@ export async function signupUserService(params: {
     if (existingUser) {
       return { error: 'User already exists' };
     }
-    const salt = generateSalt();
+    const salt = process.env.APP_SALT || generateSalt();
     const hashedPassword = hashString(password, salt);
     const user = await prisma.user.create({
       data: {
@@ -84,7 +85,7 @@ export async function loginUserService(params: {
     const user = await prisma.user.findUnique({
       where: { email },
     });
-    const salt = generateSalt();
+    const salt = process.env.APP_SALT || '';
     if (!user || user.password !== hashString(password, salt)) {
       return { error: 'Invalid credentials' };
     }

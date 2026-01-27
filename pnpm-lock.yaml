@@ -72,7 +72,7 @@ importers:
         specifier: ^8.19.0
         version: 8.19.0
       yup:
-        specifier: 1.7.1
+        specifier: ^1.7.1
         version: 1.7.1
     devDependencies:
       '@tailwindcss/postcss':

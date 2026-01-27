@@ -1,26 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/src/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { useRouter } from 'next/navigation';
+import { LogoWithText } from '../ui/logo';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const router = useRouter();
+  const navigate = (path: string) => {
+    router.push(path);
+  };
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-green-50/80 backdrop-blur-xl border-b border-green-200">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-green-400 via-green-200 to-green-500 flex items-center justify-center">
-              <span className="text-green-900 font-bold text-lg md:text-xl">IL</span>
-            </div>
-            <span className="font-display font-bold text-xl md:text-2xl text-green-900">
-              Invest<span className="text-green-600">Link</span>
-            </span>
+            <LogoWithText />
           </Link>
 
           {/* Desktop Navigation */}
@@ -54,13 +54,19 @@ const Header = () => {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <ThemeToggle />
-            <Button variant="ghost" size="default" className="text-green-700 hover:bg-green-100">
+            <Button
+              onClick={() => navigate('/login')}
+              variant="ghost"
+              size="default"
+              className="text-green-700 hover:bg-green-100"
+            >
               Log In
             </Button>
             <Button
               variant="hero"
               size="default"
               className="bg-green-600 text-white hover:bg-green-700"
+              onClick={() => navigate('/signup')}
             >
               Get Started
             </Button>
