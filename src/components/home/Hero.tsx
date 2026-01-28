@@ -1,7 +1,10 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Rocket, TrendingUp } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const HeroSection = () => {
+  const router = useRouter();
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
       {/* Background Elements */}
@@ -47,6 +50,7 @@ const HeroSection = () => {
                 variant="hero"
                 size="xl"
                 className="group bg-green-600 text-white hover:bg-green-700"
+                onClick={() => router.push('/signup?role=STARTUP')}
               >
                 <Rocket className="w-5 h-5" />
                 I&apos;m a Startup
@@ -56,6 +60,7 @@ const HeroSection = () => {
                 variant="outline"
                 size="xl"
                 className="group border-green-700 text-green-700 hover:bg-green-50"
+                onClick={() => router.push('/signup?role=INVESTOR')}
               >
                 <TrendingUp className="w-5 h-5" />
                 I&apos;m an Investor

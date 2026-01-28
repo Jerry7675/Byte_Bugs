@@ -4,6 +4,7 @@ import './globals.css';
 import ClientOnlyLayout from './ClientOnlyLayout';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 import Sonner from '@/components/ui/sonner';
+import { AuthProvider } from '@/context/authContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,10 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeProvider>
-          <Sonner />
-          <ClientOnlyLayout>{children}</ClientOnlyLayout>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <Sonner />
+            <ClientOnlyLayout>{children}</ClientOnlyLayout>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

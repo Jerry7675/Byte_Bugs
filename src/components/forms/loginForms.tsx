@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useAuth } from '@/context/authContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -9,10 +10,12 @@ import { loginUser } from '@/client/api/login-user-payload';
 import HomeIcon from '@/components/common/HomeIcon';
 export default function LoginForm() {
   const router = useRouter();
+  const { logout } = useAuth(); // for type safety, but we want to call context update after login
+  const { user, loading: authLoading, logout: _logout, ...rest } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [dirty, setDirty] = useState<{ [key: string]: boolean }>({});
@@ -39,7 +42,7 @@ export default function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setFormLoading(true);
     setResult(null);
     // Validate all fields before submit
     try {
@@ -58,21 +61,25 @@ export default function LoginForm() {
         );
       }
       setErrors(fieldErrors);
-      setLoading(false);
+      setFormLoading(false);
       return;
     }
     try {
       const result = await loginUser({ email, password });
       if (result.success) {
         setResult('Login successful!');
-        router.push('/profile ');
+        // Immediately update auth context after login
+        if (rest && typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('authChanged'));
+        }
+        router.push('/profile');
       } else {
         setResult('Error: ' + (result.error || 'Unknown error'));
       }
     } catch {
       setResult('Network error');
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
@@ -103,7 +110,7 @@ export default function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => handleBlur('email', email)}
-            disabled={loading}
+            disabled={formLoading}
           />
           {dirty.email && errors.email && (
             <div className="text-red-700 text-sm mt-1">{errors.email}</div>
@@ -122,7 +129,7 @@ export default function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => handleBlur('password', password)}
-              disabled={loading}
+              disabled={formLoading}
             />
             <button
               type="button"
@@ -141,9 +148,9 @@ export default function LoginForm() {
         <button
           type="submit"
           className="mt-8 py-3 w-full cursor-pointer rounded-md bg-green-500 text-white transition hover:bg-green-600"
-          disabled={loading}
+          disabled={formLoading}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {formLoading ? 'Logging in...' : 'Login'}
         </button>
 
         <div className="mt-4 text-center">
