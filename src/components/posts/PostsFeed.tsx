@@ -190,9 +190,9 @@ export default function PostsFeed({ refreshTrigger, showActions = false }: Posts
           )}
 
           {/* Pagination Info */}
-          <div className="text-center text-sm text-gray-500">
+          {/* <div className="text-center text-sm text-gray-500">
             Showing {posts.length} of {totalPages * 20} posts
-          </div>
+          </div> */}
         </>
       )}
     </div>

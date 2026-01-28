@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface FundingAgreementDetailProps {
   agreementId: string;
@@ -77,7 +78,7 @@ export default function FundingAgreementDetail({
       setAcceptTerms(false);
 
       // Show success message
-      alert(data.message || 'Agreement accepted successfully!');
+      toast.success(data.message || 'Agreement accepted successfully!');
     } catch (err: any) {
       setError(err.message || 'Failed to accept agreement');
     } finally {

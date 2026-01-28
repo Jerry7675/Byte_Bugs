@@ -8,6 +8,9 @@ import Image from 'next/image';
 import profilePic1 from '@/(public)/(profile-pics)/1.jpg';
 import profilePic2 from '@/(public)/(profile-pics)/2.jpg';
 import profilePic3 from '@/(public)/(profile-pics)/3.jpg';
+import techventureLogo from '@/(public)/Techventure.jpg';
+import techventureLogo2 from '@/(public)/TechVenure.jpg';
+import techventureLogo3 from '@/(public)/techventure3.jpg';
 
 const HeroSection = () => {
   const router = useRouter();
@@ -136,8 +139,9 @@ const HeroSection = () => {
               <div className="glass-card rounded-3xl p-6 md:p-8 animate-fade-up">
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 via-green-400 to-green-700 flex items-center justify-center">
-                      <Rocket className="w-7 h-7 text-white" />
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 via-green-400 to-green-700 flex items-center justify-center border-card overflow-hidden">
+                      {/* <Rocket className="w-7 h-7 text-white" /> */}
+                      <Image src={techventureLogo3} alt={'pic-1'} className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <h3 className="font-display font-bold text-lg text-foreground">
