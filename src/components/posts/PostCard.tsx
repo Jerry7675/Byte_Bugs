@@ -3,6 +3,8 @@ import { type Post } from '@/client/api/post-api';
 import { useAuth } from '@/context/authContext';
 import Image from 'next/image';
 import { MessageUserButton } from '@/components/messaging/MessageUserButton';
+import { useState } from 'react';
+import { ImageIcon } from 'lucide-react';
 
 interface PostCardProps {
   post: Post;
@@ -11,10 +13,11 @@ interface PostCardProps {
 }
 
 const categoryColors = {
-  FINTECH: 'bg-blue-100 text-blue-800',
-  HEALTH: 'bg-green-100 text-green-800',
-  AI: 'bg-purple-100 text-purple-800',
-  OTHER: 'bg-gray-100 text-gray-800',
+  FUNDING: 'bg-blue-100 text-blue-800',
+  TECHNOLOGY: 'bg-purple-100 text-purple-800',
+  MARKETING: 'bg-pink-100 text-pink-800',
+  OPERATIONS: 'bg-orange-100 text-orange-800',
+  GENERAL: 'bg-gray-100 text-gray-800',
 };
 
 const postTypeColors = {
@@ -41,6 +44,18 @@ const roleLabels = {
 export default function PostCard({ post, onDelete, showActions = false }: PostCardProps) {
   const { user } = useAuth();
   const isOwner = user?.id === post.authorId;
+  const [imageError, setImageError] = useState(false);
+
+  const isValidImageUrl = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.includes('supabase.co');
+    } catch {
+      return false;
+    }
+  };
+
+  const hasValidImage = post.imageUrl && isValidImageUrl(post.imageUrl) && !imageError;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -65,7 +80,19 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
       {/* Image */}
       {post.imageUrl && (
         <div className="relative w-full h-64 bg-gray-100">
-          <Image src={post.imageUrl} alt={post.title} fill className="object-cover" />
+          {hasValidImage ? (
+            <Image
+              src={post.imageUrl}
+              alt={post.title}
+              fill
+              className="object-cover"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-200">
+              <ImageIcon className="w-16 h-16 text-gray-400" />
+            </div>
+          )}
         </div>
       )}
 
@@ -82,7 +109,7 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
             </span>
             <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${
-                categoryColors[post.category as keyof typeof categoryColors] || categoryColors.OTHER
+                categoryColors[post.category as keyof typeof categoryColors] || categoryColors.GENERAL
               }`}
             >
               {post.category}

@@ -1,7 +1,7 @@
 export interface CreatePostPayload {
   title: string;
   content: string;
-  category: 'FINTECH' | 'HEALTH' | 'AI' | 'OTHER';
+  category: 'FUNDING' | 'TECHNOLOGY' | 'MARKETING' | 'OPERATIONS' | 'GENERAL';
   postType?: 'FUNDING_REQUEST' | 'INVESTMENT_OFFER' | 'UPDATE' | 'ANNOUNCEMENT' | 'MILESTONE' | 'OTHER';
   imageUrl?: string;
   tags?: string[];
