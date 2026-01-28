@@ -11,6 +11,7 @@ import {
   sendMessage as sendMessageApi,
   markMessagesAsRead,
   getQuotaStatus,
+  getUnreadCount,
   type Message,
   type Conversation,
   type QuotaStatus,
@@ -238,5 +239,42 @@ export function useQuotaStatus() {
     quota,
     loading,
     refetch: fetchQuota,
+  };
+}
+
+/**
+ * Hook to get unread message count
+ */
+export function useUnreadCount() {
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCount = useCallback(async () => {
+    try {
+      const response = await getUnreadCount();
+
+      if (response.success && response.data) {
+        setCount(response.data.count);
+      }
+    } catch (err) {
+      console.error('Failed to fetch unread count:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCount();
+
+    // Poll for updates every 5 seconds
+    const interval = setInterval(fetchCount, 5000);
+
+    return () => clearInterval(interval);
+  }, [fetchCount]);
+
+  return {
+    count,
+    loading,
+    refetch: fetchCount,
   };
 }

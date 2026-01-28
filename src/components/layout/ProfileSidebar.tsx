@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import Link from 'next/link';
 import styles from '../ProfileSidebar.module.css';
 import { useVerificationSummary } from '@/client/hooks/useVerification';
+import { useUnreadCount } from '@/client/hooks/useMessaging';
 
 interface ProfileSidebarProps {
   open: boolean;
@@ -22,6 +23,7 @@ export default function ProfileSidebar({ open, onClose, onLogout, user }: Profil
   const [profileImg, setProfileImg] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const { summary } = useVerificationSummary();
+  const { count: unreadCount } = useUnreadCount();
 
   useEffect(() => {
     setMounted(true);
@@ -104,12 +106,12 @@ export default function ProfileSidebar({ open, onClose, onLogout, user }: Profil
               <Link href="/wallet" className={styles.link} onClick={onClose}>
                 <span className={styles.bullet} /> Wallet
               </Link>
-              <Link href="/settings" className={styles.link} onClick={onClose}>
-                <span className={styles.bullet} /> Settings
+              <Link href="/swipe" className={styles.link} onClick={onClose}>
+                <span className={styles.bullet} /> DealSwipe
               </Link>
               <Link href="/messages" className={styles.link} onClick={onClose}>
                 <span className={styles.bullet} /> Inbox
-                <span className={styles.badge}>14</span>
+                {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
               </Link>
               <button
                 className={`${styles.link} ${styles.logout}`}

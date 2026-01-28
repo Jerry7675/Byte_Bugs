@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useConversations } from '@/client/hooks/useMessaging';
+import { useConversations, useQuotaStatus } from '@/client/hooks/useMessaging';
 import { ChatInterface } from '@/components/messaging/ChatInterface';
 import { QuotaDisplay } from '@/components/messaging/QuotaDisplay';
 import { MessageCircle, User, Search } from 'lucide-react';
@@ -18,6 +18,7 @@ export default function MessagesPage() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
   const { conversations, loading } = useConversations();
+  const { quota, refetch: refetchQuota } = useQuotaStatus();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -58,7 +59,7 @@ export default function MessagesPage() {
             <MessageCircle className="w-6 h-6 text-green-600" />
             <h1 className="text-xl font-bold text-gray-900">Messages</h1>
           </div>
-          <QuotaDisplay />
+          <QuotaDisplay quotaStatus={quota} />
         </div>
       </div>
 
@@ -165,6 +166,7 @@ export default function MessagesPage() {
               conversationId={selectedConversation.id}
               currentUserId={user.id}
               otherUser={otherUser}
+              onMessageSent={refetchQuota}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center text-gray-500">

@@ -71,6 +71,27 @@ enum ConversationStatus {
   CLOSED
 }
 
+enum FundingAgreementStatus {
+  PENDING_INVESTOR
+  PENDING_STARTUP
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+enum FundingCategory {
+  SEED
+  SERIES_A
+  SERIES_B
+  SERIES_C
+  BRIDGE
+  VENTURE_DEBT
+  ANGEL
+  STRATEGIC
+  OTHER
+}
+
 model User {
   id            String   @id @default(uuid())
   email         String   @unique
@@ -118,6 +139,23 @@ model User {
   
   // Daily message quota tracking
   messageQuota            MessageQuota?
+  
+  // Funding agreements
+  initiatedFundingAgreements  FundingAgreement[] @relation("AgreementInitiator")
+  receivedFundingAgreements   FundingAgreement[] @relation("AgreementCounterparty")
+  
+  // Successful fundings
+  investorFundings            SuccessfulFunding[] @relation("FundingInvestor")
+  startupFundings             SuccessfulFunding[] @relation("FundingStartup")
+  
+  // Swipe interactions
+  swipesGiven                 SwipeInteraction[] @relation("Swiper")
+  swipesReceived              SwipeInteraction[] @relation("SwipedProfile")
+  swipeQuota                  SwipeQuota?
+  
+  // Matches
+  matchesAsUser1              ProfileMatch[] @relation("MatchUser1")
+  matchesAsUser2              ProfileMatch[] @relation("MatchUser2")
 }
 
 model Session {
@@ -337,12 +375,7 @@ model VerificationStage {
   type        VerificationType
   status      VerificationStageStatus @default(PENDING)
   
-  // Metadata stores type-specific verification data as JSON
-  // Examples:
-  // - IDENTITY: { documentType, documentNumber, documentUrls, facePhotoUrl }
-  // - ROLE: { proofType, proofUrls, accreditationData, incorporationDetails }
-  // - ACTIVITY: { score, metrics, lastCalculated }
-  // - COMMUNITY: { trustScore, endorsementCount, reviewScore }
+
   metadata    Json?
   
   // Audit trail
@@ -437,3 +470,164 @@ model MessageQuota {
   
   @@index([userId, quotaDate])
 }
+
+// Funding Agreement - Negotiation Phase
+model FundingAgreement {
+  id                String   @id @default(uuid())
+  
+  // Parties
+  initiator         User     @relation("AgreementInitiator", fields: [initiatorId], references: [id])
+  initiatorId       String
+  counterparty      User     @relation("AgreementCounterparty", fields: [counterpartyId], references: [id])
+  counterpartyId    String
+  
+  // Agreement details
+  category          FundingCategory
+  fundingAmount     Decimal  @db.Decimal(15, 2) // Total funding amount
+  platformCommissionRate Decimal @default(5.0) @db.Decimal(5, 2) // Platform commission percentage (e.g., 5.00 = 5%)
+  platformCommission     Decimal @db.Decimal(15, 2) // Calculated commission amount
+  netAmount              Decimal @db.Decimal(15, 2) // Amount after commission
+  
+  // Terms acceptance
+  termsVersion      String   // e.g., "v1.0.0" - tracks which version of platform terms was accepted
+  termsAcceptedByInitiator    Boolean @default(false)
+  termsAcceptedByCounterparty Boolean @default(false)
+  initiatorAcceptedAt         DateTime?
+  counterpartyAcceptedAt      DateTime?
+  
+  // Status and workflow
+  status            FundingAgreementStatus @default(PENDING_INVESTOR)
+  
+  // Rejection/Cancellation
+  rejectedBy        String?  // userId who rejected
+  rejectionReason   String?
+  cancelledBy       String?  // userId who cancelled
+  cancellationReason String?
+  
+  // Audit trail
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  completedAt       DateTime? // When both parties accepted
+  
+  // Reference to successful funding (if completed)
+  successfulFunding SuccessfulFunding?
+  
+  @@index([initiatorId])
+  @@index([counterpartyId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Successful Funding - Immutable Record
+model SuccessfulFunding {
+  id                String   @id @default(uuid())
+  
+  // Reference to original agreement
+  agreement         FundingAgreement @relation(fields: [agreementId], references: [id])
+  agreementId       String   @unique
+  
+  // Parties (denormalized for immutability)
+  investor          User     @relation("FundingInvestor", fields: [investorId], references: [id])
+  investorId        String
+  startup           User     @relation("FundingStartup", fields: [startupId], references: [id])
+  startupId         String
+  
+  // Financial details (denormalized snapshot)
+  category          FundingCategory
+  fundingAmount     Decimal  @db.Decimal(15, 2)
+  platformCommission Decimal @db.Decimal(15, 2)
+  netAmount         Decimal  @db.Decimal(15, 2)
+  
+  // Terms reference
+  termsVersion      String
+  
+  // Immutable record metadata
+  completedAt       DateTime @default(now())
+  createdAt         DateTime @default(now())
+  
+  // TODO: Add payment settlement tracking when integrated with payment gateway
+  // paymentStatus     String?
+  // paymentReference  String?
+  // paymentCompletedAt DateTime?
+  
+  @@index([investorId, completedAt])
+  @@index([startupId, completedAt])
+  @@index([completedAt])
+}
+
+// Swipe Interaction - Tinder-like Matching System
+enum SwipeAction {
+  LIKE
+  DISLIKE
+  SKIP
+}
+
+model SwipeInteraction {
+  id                String      @id @default(uuid())
+  
+  // Who swiped
+  swiper            User        @relation("Swiper", fields: [swiperId], references: [id])
+  swiperId          String
+  
+  // Who was swiped on
+  swipedProfile     User        @relation("SwipedProfile", fields: [swipedProfileId], references: [id])
+  swipedProfileId   String
+  
+  // Swipe action
+  action            SwipeAction
+  
+  // Metadata
+  createdAt         DateTime    @default(now())
+  
+  @@index([swiperId, createdAt])
+  @@index([swipedProfileId])
+  @@index([swiperId, swipedProfileId])
+  @@unique([swiperId, swipedProfileId]) // Prevent duplicate swipes on same profile
+}
+
+// Daily Swipe Quota - 10 free swipes per day
+model SwipeQuota {
+  id                String   @id @default(uuid())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String   @unique
+  
+  // Daily quota tracking
+  swipesToday       Int      @default(0)
+  quotaDate         DateTime @default(now()) // Date for which this quota applies
+  
+  // Last skipped profile for undo functionality
+  lastSkippedProfileId String?
+  lastSkipTime      DateTime?
+  
+  // Configuration
+  dailyFreeLimit    Int      @default(10)
+  pointsPerSwipe    Int      @default(5)   // Points to deduct after free limit
+  pointsPerUndo     Int      @default(10)  // Points to deduct for undo action
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId, quotaDate])
+}
+
+// Profile Match - When both users like each other
+model ProfileMatch {
+  id                String   @id @default(uuid())
+  
+  // The two matched users
+  user1             User     @relation("MatchUser1", fields: [user1Id], references: [id])
+  user1Id           String
+  user2             User     @relation("MatchUser2", fields: [user2Id], references: [id])
+  user2Id           String
+  
+  // Match metadata
+  matchedAt         DateTime @default(now())
+  isActive          Boolean  @default(true) // Can be set to false if either user unmatches
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([user1Id])
+  @@index([user2Id])
+  @@unique([user1Id, user2Id])
+}
+

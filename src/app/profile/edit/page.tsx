@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/authContext';
 import { ArrowLeft, Save, Loader } from 'lucide-react';
 import { toast } from 'sonner';
+import ImageUploader from '@/components/common/ImageUploader';
 
 interface Category {
   id: string;
@@ -147,7 +148,7 @@ export default function EditProfilePage() {
 
   const toggleCategory = (categoryId: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId],
     );
   };
 
@@ -319,22 +320,13 @@ export default function EditProfilePage() {
               />
             </div>
 
-            {/* Photo URL */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Profile Photo URL
-              </label>
-              <input
-                type="url"
-                value={photo}
-                onChange={(e) => setPhoto(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
-                placeholder="https://example.com/photo.jpg"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Upload your photo to Supabase or another hosting service and paste the URL here
-              </p>
-            </div>
+            {/* Photo Upload */}
+            <ImageUploader
+              currentImage={photo}
+              onUploadSuccess={(url) => setPhoto(url)}
+              label={isStartup ? 'Startup Logo' : 'Profile Photo'}
+              isCompany={isStartup}
+            />
 
             {/* Categories */}
             <div>

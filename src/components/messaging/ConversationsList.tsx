@@ -1,8 +1,3 @@
-/**
- * Conversations List Component
- * Shows all user's conversations
- */
-
 'use client';
 
 import { useConversations } from '@/client/hooks/useMessaging';

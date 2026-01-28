@@ -7,9 +7,16 @@
 
 import { useQuotaStatus } from '@/client/hooks/useMessaging';
 import { MessageCircle, Coins } from 'lucide-react';
+import { type QuotaStatus } from '@/client/api/messaging-api';
 
-export function QuotaDisplay() {
-  const { quota, loading } = useQuotaStatus();
+interface QuotaDisplayProps {
+  quotaStatus?: QuotaStatus | null;
+}
+
+export function QuotaDisplay({ quotaStatus: externalQuota }: QuotaDisplayProps) {
+  const { quota: internalQuota, loading } = useQuotaStatus();
+
+  const quota = externalQuota || internalQuota;
 
   if (loading || !quota) {
     return null;

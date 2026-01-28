@@ -21,16 +21,14 @@ export function CategoryTags({ categories, max }: CategoryTagsProps) {
   const remaining = max && categories.length > max ? categories.length - max : 0;
 
   if (categories.length === 0) {
-    return (
-      <span className="text-sm text-gray-500 italic">No categories yet</span>
-    );
+    return <span className="text-sm text-gray-500 italic">No categories yet</span>;
   }
 
   return (
     <div className="flex flex-wrap gap-2">
-      {displayCategories.map((category) => (
+      {displayCategories.map((category, index) => (
         <span
-          key={category}
+          key={`${category}-${index}`}
           className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
         >
           {categoryLabels[category] || category}
