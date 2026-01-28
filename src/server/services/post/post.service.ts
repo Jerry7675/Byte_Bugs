@@ -22,13 +22,19 @@ export class PostService {
     
     // Only verified startup/investor can post
     if (user.role === 'STARTUP' || user.role === 'INVESTOR') {
-      const latestVerification = await prisma.verificationApplication.findFirst({
-        where: { userId: user.id, status: PrismaEnums.VerificationStatus.VERIFIED },
-        orderBy: { appliedAt: 'desc' },
-      });
-      if (!latestVerification) throw new Error('User not verified');
-    } else {
-      throw new Error('Only startups or investors can create posts');
+      // Check if user has at least IDENTITY verification approved
+      const identityVerification = await prisma.verificationStage.findFirst({
+        where: { 
+          userId: user.id, 
+          type: PrismaEnums.VerificationType.IDENTITY,
+          status: PrismaEnums.VerificationStageStatus.APPROVED 
+        },
+      }); 
+      if (!identityVerification) {
+        throw new Error('You must complete identity verification before creating posts');
+      }
+    } else if (user.role !== 'ADMIN') {
+      throw new Error('Only startups, investors, or admins can create posts');
     }
     
     return prisma.post.create({

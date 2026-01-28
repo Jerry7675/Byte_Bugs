@@ -30,6 +30,7 @@ export class VerificationEngineService {
   /**
    * Submit a verification stage
    * Can be called by user (for IDENTITY, ROLE) or system (for ACTIVITY, COMMUNITY)
+   * If a pending/in_review verification exists, it will be updated instead of creating a new one
    */
   static async submitVerificationStage(params: SubmitVerificationParams) {
     const { prisma, user } = getContext();
@@ -40,34 +41,43 @@ export class VerificationEngineService {
     // Validate based on type
     this.validateVerificationMetadata(type, metadata, user.role);
 
-    // Check if there's already an approved or pending verification of this type
+    // Check if there's already an existing verification of this type
     const existing = await prisma.verificationStage.findFirst({
       where: {
         userId: user.id,
         type: type as any,
-        status: {
-          in: [
-            PrismaEnums.VerificationStageStatus.PENDING,
-            PrismaEnums.VerificationStageStatus.IN_REVIEW,
-            PrismaEnums.VerificationStageStatus.APPROVED,
-          ],
-        },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
+    // If approved, don't allow resubmission
     if (existing && existing.status === PrismaEnums.VerificationStageStatus.APPROVED) {
       throw new Error(`You already have an approved ${type} verification`);
     }
 
+    // If pending or in review, update the existing verification
     if (
       existing &&
       (existing.status === PrismaEnums.VerificationStageStatus.PENDING ||
         existing.status === PrismaEnums.VerificationStageStatus.IN_REVIEW)
     ) {
-      throw new Error(`You already have a pending ${type} verification`);
+      return prisma.verificationStage.update({
+        where: { id: existing.id },
+        data: {
+          metadata: metadata as Prisma.InputJsonValue,
+          status: PrismaEnums.VerificationStageStatus.PENDING,
+          submittedBy: PrismaEnums.VerificationActor.USER,
+          submittedAt: new Date(),
+          reviewedBy: null,
+          reviewedAt: null,
+          reviewNote: null,
+        },
+      });
     }
 
-    // Create the verification stage
+    // If rejected or no existing verification, create a new one
     return prisma.verificationStage.create({
       data: {
         userId: user.id,
@@ -225,27 +235,18 @@ export class VerificationEngineService {
   ) {
     switch (type) {
       case 'IDENTITY':
-        if (!metadata.documentType || !metadata.documentUrls) {
-          throw new Error('Identity verification requires documentType and documentUrls');
+        if (!metadata.documentType) {
+          throw new Error('Identity verification requires documentType');
         }
+        // documentUrls can be optional or empty array
         break;
 
       case 'ROLE':
-        if (userRole === 'INVESTOR') {
-          // Investor-specific validation
-          if (!metadata.proofType) {
-            throw new Error('Role verification for investors requires proofType');
-          }
-          // Could require: proof of funds, accreditation, portfolio
-        } else if (userRole === 'STARTUP') {
-          // Startup-specific validation
-          if (!metadata.incorporationProof && !metadata.registrationProof) {
-            throw new Error(
-              'Role verification for startups requires incorporation or registration proof',
-            );
-          }
-          // Could require: incorporation docs, pitch deck, business registration
+        // Role verification is flexible - just ensure some metadata exists
+        if (!metadata || Object.keys(metadata).length === 0) {
+          throw new Error('Role verification requires some proof documentation');
         }
+        // Accept any metadata structure for role verification
         break;
 
       case 'ACTIVITY':
