@@ -1,8 +1,10 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import HeroSection from '@/components/home/Hero';
 import { useAuth } from '@/context/authContext';
+
+import HeroSection from '@/components/home/Hero';
+import HowItWorks from '@/components/home/HowItWorks';
 
 export default function HomePage() {
   const { user, loading } = useAuth();
@@ -20,5 +22,10 @@ export default function HomePage() {
   }
 
   // Show HeroSection for unauthenticated users
-  return <HeroSection />;
+  return (
+    <div>
+      <HeroSection />
+      <HowItWorks />
+    </div>
+  );
 }

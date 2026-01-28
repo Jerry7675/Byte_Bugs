@@ -2,11 +2,37 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Rocket, TrendingUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
+import Image from 'next/image';
+import profilePic1 from '@/(public)/(profile-pics)/1.jpg';
+import profilePic2 from '@/(public)/(profile-pics)/2.jpg';
+import profilePic3 from '@/(public)/(profile-pics)/3.jpg';
 
 const HeroSection = () => {
   const router = useRouter();
+  const [stats, setStats] = useState({
+    totalStartups: "6",
+    totalInvestors: "4",
+  });
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setStats({
+            totalStartups: data.data.totalStartups,
+            totalInvestors: data.data.totalInvestors,
+          });
+        }
+      })
+      .catch(() => {
+        // Keep default values on error
+      });
+  }, []);
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-b from-white via-white to-green-50/30">
       {/* Background Elements */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-20 left-10 w-72 h-72 bg-green-200/30 rounded-full blur-3xl animate-float" />
@@ -26,7 +52,7 @@ const HeroSection = () => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
-              Trusted by 500+ Startups & Investors
+              Trusted by 12+ Startups & Investors
             </div>
 
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
@@ -79,13 +105,15 @@ const HeroSection = () => {
               <div className="w-px h-12 bg-border" />
               <div className="text-center">
                 <p className="font-display font-bold text-2xl md:text-3xl text-foreground">
-                  1,200+
+                  {stats.totalStartups.toLocaleString()}+
                 </p>
                 <p className="text-sm text-muted-foreground">Verified Startups</p>
               </div>
               <div className="w-px h-12 bg-border" />
               <div className="text-center">
-                <p className="font-display font-bold text-2xl md:text-3xl text-foreground">850+</p>
+                <p className="font-display font-bold text-2xl md:text-3xl text-foreground">
+                  {stats.totalInvestors.toLocaleString()}+
+                </p>
                 <p className="text-sm text-muted-foreground">Active Investors</p>
               </div>
             </div>
@@ -103,7 +131,7 @@ const HeroSection = () => {
                     </div>
                     <div>
                       <h3 className="font-display font-bold text-lg text-foreground">
-                        TechVenture AI
+                        TechVenture
                       </h3>
                       <p className="text-sm text-muted-foreground">Series A • Fintech</p>
                     </div>
@@ -113,7 +141,7 @@ const HeroSection = () => {
                   </div>
 
                   <p className="text-muted-foreground">
-                    AI-powered financial analytics platform helping SMBs make data-driven decisions.
+                    Financial analytics platform helping SMBs make data-driven decisions.
                   </p>
 
                   <div className="flex items-center justify-between pt-4 border-t border-border">
@@ -154,9 +182,9 @@ const HeroSection = () => {
               >
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-green-600 border-2 border-card" />
-                    <div className="w-8 h-8 rounded-full bg-green-400 border-2 border-card" />
-                    <div className="w-8 h-8 rounded-full bg-green-800 border-2 border-card" />
+                    <div className="w-8 h-8 rounded-full bg-green-600 border-2 border-card overflow-hidden"><Image src={profilePic1} alt={'pic-1'} className="w-full h-full object-cover" /></div>
+                    <div className="w-8 h-8 rounded-full bg-green-400 border-2 border-card overflow-hidden"><Image src={profilePic2} alt={'pic-2'} className="w-full h-full object-cover" /></div>
+                    <div className="w-8 h-8 rounded-full bg-green-800 border-2 border-card overflow-hidden"><Image src={profilePic3} alt={'pic-3'} className="w-full h-full object-cover" /></div>
                   </div>
                   <p className="text-sm text-green-700">+12 viewing now</p>
                 </div>
