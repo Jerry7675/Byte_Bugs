@@ -117,8 +117,9 @@ export function VerificationDashboard() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Identity Verification */}
-          <div
-            className={`border-2 rounded-xl p-5 transition-all hover:shadow-md ${getStatusColor(summary?.identity?.status)}`}
+          <button
+            onClick={() => router.push('/verification/submit?tab=identity')}
+            className={`border-2 rounded-xl p-5 transition-all hover:shadow-md cursor-pointer text-left ${getStatusColor(summary?.identity?.status)}`}
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-sm">Identity</h3>
@@ -128,11 +129,15 @@ export function VerificationDashboard() {
               {summary?.identity?.status || 'Not Started'}
             </div>
             {!summary?.identity && <p className="text-xs opacity-75 mt-2">Submit ID documents</p>}
-          </div>
+            {summary?.identity && summary?.identity.status !== 'APPROVED' && (
+              <p className="text-xs opacity-75 mt-2">Click to view/update</p>
+            )}
+          </button>
 
           {/* Role Verification */}
-          <div
-            className={`border-2 rounded-xl p-5 transition-all hover:shadow-md ${getStatusColor(summary?.role?.status)}`}
+          <button
+            onClick={() => router.push('/verification/submit?tab=role')}
+            className={`border-2 rounded-xl p-5 transition-all hover:shadow-md cursor-pointer text-left ${getStatusColor(summary?.role?.status)}`}
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-sm">Role</h3>
@@ -140,11 +145,14 @@ export function VerificationDashboard() {
             </div>
             <div className="text-xs font-medium mb-2">{summary?.role?.status || 'Not Started'}</div>
             {!summary?.role && <p className="text-xs opacity-75 mt-2">Verify Investor/Startup</p>}
-          </div>
+            {summary?.role && summary?.role.status !== 'APPROVED' && (
+              <p className="text-xs opacity-75 mt-2">Click to view/update</p>
+            )}
+          </button>
 
           {/* Activity Verification */}
           <div
-            className={`border-2 rounded-xl p-5 transition-all hover:shadow-md ${getStatusColor(summary?.activity?.status)}`}
+            className={`border-2 rounded-xl p-5 transition-all ${summary?.activity ? 'hover:shadow-md' : 'opacity-75'}`}
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-sm">Activity</h3>
@@ -167,11 +175,12 @@ export function VerificationDashboard() {
                 />
               </div>
             </div>
+            {!summary?.activity && <p className="text-xs opacity-75 mt-2">Earned through engagement</p>}
           </div>
 
           {/* Community Verification */}
           <div
-            className={`border-2 rounded-xl p-5 transition-all hover:shadow-md ${getStatusColor(summary?.community?.status)}`}
+            className={`border-2 rounded-xl p-5 transition-all ${summary?.community ? 'hover:shadow-md' : 'opacity-75'}`}
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-sm">Community</h3>
@@ -192,6 +201,7 @@ export function VerificationDashboard() {
                 />
               </div>
             </div>
+            {!summary?.community && <p className="text-xs opacity-75 mt-2">Built through reviews</p>}
           </div>
         </div>
       </div>

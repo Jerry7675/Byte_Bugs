@@ -1,8 +1,19 @@
 'use client';
+import { useState } from 'react';
 import { useAuth } from '@/context/authContext';
+import CreatePostForm from '@/components/posts/CreatePostForm';
+import PostsFeed from '@/components/posts/PostsFeed';
+import { Button } from '@/components/ui/button';
 
 export default function InvestorDashboard() {
   const { user } = useAuth();
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handlePostCreated = () => {
+    setShowCreatePost(false);
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
   return (
     <div className="space-y-6">
@@ -26,9 +37,26 @@ export default function InvestorDashboard() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activities</h2>
-        <p className="text-gray-500">No recent activities yet</p>
+      {/* Posting System */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Community Feed</h2>
+          <Button
+            onClick={() => setShowCreatePost(!showCreatePost)}
+            variant={showCreatePost ? 'outline' : 'default'}
+          >
+            {showCreatePost ? 'Cancel' : '+ Create Post'}
+          </Button>
+        </div>
+
+        {showCreatePost && (
+          <CreatePostForm
+            onSuccess={handlePostCreated}
+            onCancel={() => setShowCreatePost(false)}
+          />
+        )}
+
+        <PostsFeed refreshTrigger={refreshTrigger} showActions={true} />
       </div>
     </div>
   );

@@ -1,12 +1,15 @@
 'use client';
 
 import { VerificationDashboard } from '@/components/verification/VerificationDashboardNew';
+import { AdminVerificationReview } from '@/components/verification/AdminVerificationReview';
 import { useVerificationSummary } from '@/client/hooks/useVerification';
+import { useAuth } from '@/context/authContext';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, Shield, TrendingUp, Users, ArrowRight } from 'lucide-react';
 
 export default function VerificationPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const { summary, loading } = useVerificationSummary();
 
   // Show loading state
@@ -22,10 +25,29 @@ export default function VerificationPage() {
     );
   }
 
+  // Show Admin Review Panel if user is ADMIN
+  if (user?.role === 'ADMIN') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              Admin: Verification Review
+            </h1>
+            <p className="text-gray-600 text-sm md:text-base">
+              Review and manage user verification requests
+            </p>
+          </div>
+          <AdminVerificationReview />
+        </div>
+      </div>
+    );
+  }
+
   // Check if user has started verification (has any identity or role verification)
   const hasStartedVerification = summary?.identity || summary?.role;
 
-  // Show "Get Verified" page if user hasn't started verification
+  // Show "Get Verified" page if user hasn't started any verification
   if (!hasStartedVerification) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4 sm:px-6 lg:px-8">

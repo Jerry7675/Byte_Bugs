@@ -12,6 +12,7 @@ import { PrismaEnums } from '@/enumWrapper';
 export default function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -28,6 +29,11 @@ export default function SignupForm() {
   const [dirty, setDirty] = useState<{ [key: string]: boolean }>({});
   const [role, setRole] = useState<keyof typeof PrismaEnums.UserRole>('STARTUP');
 
+  // Prevent hydration mismatch by only rendering after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Set role from query param if present
   useEffect(() => {
     const roleParam = searchParams.get('role');
@@ -35,6 +41,17 @@ export default function SignupForm() {
       setRole(roleParam as keyof typeof PrismaEnums.UserRole);
     }
   }, [searchParams]);
+
+  if (!mounted) {
+    return (
+      <main className="flex items-center justify-center w-full min-h-screen bg-white px-2 md:px-4">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-12 w-48 bg-green-200 rounded mb-4"></div>
+          <div className="h-8 w-64 bg-green-100 rounded"></div>
+        </div>
+      </main>
+    );
+  }
   const validateField = async (field: string, value: string) => {
     try {
       if (field === 'confirmPassword') {

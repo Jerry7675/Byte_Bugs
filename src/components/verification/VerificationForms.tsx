@@ -4,18 +4,32 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSubmitVerification } from '@/client/hooks/useVerification';
 
-export function IdentityVerificationForm({ onSuccess }: { onSuccess?: () => void }) {
+export function IdentityVerificationForm({ onSuccess, initialData }: { onSuccess?: () => void; initialData?: any }) {
   const { submit, submitting, error } = useSubmitVerification();
 
   const [formData, setFormData] = useState({
-    documentType: '',
-    documentNumber: '',
-    documentUrls: [''],
-    facePhotoUrl: '',
+    documentType: initialData?.documentType || '',
+    documentNumber: initialData?.documentNumber || '',
+    documentUrls: initialData?.documentUrls?.length > 0 ? initialData.documentUrls : [''],
+    facePhotoUrl: initialData?.facePhotoUrl || '',
   });
+
+  const [initialFormData] = useState({
+    documentType: initialData?.documentType || '',
+    documentNumber: initialData?.documentNumber || '',
+    documentUrls: initialData?.documentUrls?.length > 0 ? initialData.documentUrls : [''],
+    facePhotoUrl: initialData?.facePhotoUrl || '',
+  });
+
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    const changed = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    setHasChanges(changed);
+  }, [formData, initialFormData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,11 +170,14 @@ export function IdentityVerificationForm({ onSuccess }: { onSuccess?: () => void
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={submitting}
-          className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={submitting || (initialData && !hasChanges)}
+          className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          {submitting ? 'Submitting...' : 'Submit Verification'}
+          {submitting ? 'Submitting...' : initialData ? 'Update & Resubmit' : 'Submit Verification'}
         </button>
+        {initialData && !hasChanges && (
+          <p className="text-sm text-amber-600 text-center">Please make changes before resubmitting</p>
+        )}
       </form>
 
       <div className="mt-6 bg-green-50 border border-green-200 rounded p-4">
@@ -179,15 +196,29 @@ export function IdentityVerificationForm({ onSuccess }: { onSuccess?: () => void
 /**
  * Example Role Verification Form for Investors
  */
-export function InvestorRoleVerificationForm({ onSuccess }: { onSuccess?: () => void }) {
+export function InvestorRoleVerificationForm({ onSuccess, initialData }: { onSuccess?: () => void; initialData?: any }) {
   const { submit, submitting, error } = useSubmitVerification();
 
   const [formData, setFormData] = useState({
-    proofType: '',
-    proofUrls: [''],
-    accreditationNumber: '',
-    fundAmount: '',
+    proofType: initialData?.proofType || '',
+    proofUrls: initialData?.proofUrls?.length > 0 ? initialData.proofUrls : [''],
+    accreditationNumber: initialData?.accreditationNumber || '',
+    fundAmount: initialData?.fundAmount?.toString() || '',
   });
+
+  const [initialFormData] = useState({
+    proofType: initialData?.proofType || '',
+    proofUrls: initialData?.proofUrls?.length > 0 ? initialData.proofUrls : [''],
+    accreditationNumber: initialData?.accreditationNumber || '',
+    fundAmount: initialData?.fundAmount?.toString() || '',
+  });
+
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    const changed = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    setHasChanges(changed);
+  }, [formData, initialFormData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,11 +313,14 @@ export function InvestorRoleVerificationForm({ onSuccess }: { onSuccess?: () => 
 
         <button
           type="submit"
-          disabled={submitting}
-          className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
+          disabled={submitting || (initialData && !hasChanges)}
+          className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400"
         >
-          {submitting ? 'Submitting...' : 'Submit Role Verification'}
+          {submitting ? 'Submitting...' : initialData ? 'Update & Resubmit' : 'Submit Verification'}
         </button>
+        {initialData && !hasChanges && (
+          <p className="text-sm text-amber-600 text-center">Please make changes before resubmitting</p>
+        )}
       </form>
     </div>
   );
@@ -295,16 +329,31 @@ export function InvestorRoleVerificationForm({ onSuccess }: { onSuccess?: () => 
 /**
  * Example Role Verification Form for Startups
  */
-export function StartupRoleVerificationForm({ onSuccess }: { onSuccess?: () => void }) {
+export function StartupRoleVerificationForm({ onSuccess, initialData }: { onSuccess?: () => void; initialData?: any }) {
   const { submit, submitting, error } = useSubmitVerification();
 
   const [formData, setFormData] = useState({
-    proofType: '',
-    proofUrls: [''],
-    incorporationNumber: '',
-    incorporationDate: '',
-    gstNumber: '',
+    proofType: initialData?.proofType || '',
+    proofUrls: initialData?.proofUrls?.length > 0 ? initialData.proofUrls : [''],
+    incorporationNumber: initialData?.incorporationNumber || '',
+    incorporationDate: initialData?.incorporationDate || '',
+    gstNumber: initialData?.gstNumber || '',
   });
+
+  const [initialFormData] = useState({
+    proofType: initialData?.proofType || '',
+    proofUrls: initialData?.proofUrls?.length > 0 ? initialData.proofUrls : [''],
+    incorporationNumber: initialData?.incorporationNumber || '',
+    incorporationDate: initialData?.incorporationDate || '',
+    gstNumber: initialData?.gstNumber || '',
+  });
+
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    const changed = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    setHasChanges(changed);
+  }, [formData, initialFormData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -413,11 +462,14 @@ export function StartupRoleVerificationForm({ onSuccess }: { onSuccess?: () => v
 
         <button
           type="submit"
-          disabled={submitting}
-          className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
+          disabled={submitting || (initialData && !hasChanges)}
+          className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? 'Submitting...' : 'Submit Role Verification'}
+          {submitting ? 'Submitting...' : initialData ? 'Update & Resubmit' : 'Submit Role Verification'}
         </button>
+        {initialData && !hasChanges && (
+          <p className="text-sm text-amber-600 text-center">Please make changes before resubmitting</p>
+        )}
       </form>
     </div>
   );
