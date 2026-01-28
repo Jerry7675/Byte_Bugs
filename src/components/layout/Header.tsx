@@ -37,8 +37,8 @@ const Header = () => {
         onLogout={logout}
         user={user}
       />
-      <header className="fixed top-0 left-0 right-0 z-50 bg-green-50/80 backdrop-blur-xl border-b border-green-200">
-        <div className="container mx-auto px-4">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-green-50/95 backdrop-blur-xl border-b border-green-200 shadow-sm">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
@@ -118,9 +118,21 @@ const Header = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Actions */}
             <div className="flex items-center gap-2 md:hidden">
-              <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {user && (
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="p-2 hover:bg-green-100 rounded-full transition"
+                  title="Profile"
+                >
+                  <UserCircle className="w-6 h-6 text-green-700" />
+                </button>
+              )}
+              <button
+                className="p-2 hover:bg-green-100 rounded-full transition"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
                 {mobileMenuOpen ? (
                   <X className="w-6 h-6 text-green-900" />
                 ) : (

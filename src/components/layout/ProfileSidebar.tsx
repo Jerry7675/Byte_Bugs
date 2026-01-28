@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import Link from 'next/link';
 import styles from '../ProfileSidebar.module.css';
+import { useVerificationSummary } from '@/client/hooks/useVerification';
 
 interface ProfileSidebarProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface ProfileSidebarProps {
 export default function ProfileSidebar({ open, onClose, onLogout, user }: ProfileSidebarProps) {
   const [profileImg, setProfileImg] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { summary } = useVerificationSummary();
 
   useEffect(() => {
     setMounted(true);
@@ -88,6 +90,19 @@ export default function ProfileSidebar({ open, onClose, onLogout, user }: Profil
               </Link>
               <Link href="/profile" className={styles.link} onClick={onClose}>
                 <span className={styles.bullet} /> Profile
+              </Link>
+              <Link href="/verification" className={styles.link} onClick={onClose}>
+                <span className={styles.bullet} /> Verification
+                {summary?.isFullyVerified ? (
+                  <span className={styles.verifiedBadge}>✓</span>
+                ) : (
+                  <span className={styles.badge}>
+                    {Math.round((summary?.activityScore ?? 0) + (summary?.trustScore ?? 0)) / 2}%
+                  </span>
+                )}
+              </Link>
+              <Link href="/wallet" className={styles.link} onClick={onClose}>
+                <span className={styles.bullet} /> Wallet
               </Link>
               <Link href="/settings" className={styles.link} onClick={onClose}>
                 <span className={styles.bullet} /> Settings

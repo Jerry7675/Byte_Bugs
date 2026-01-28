@@ -20,6 +20,26 @@ enum VerificationStatus {
   REJECTED
 }
 
+enum VerificationType {
+  IDENTITY
+  ROLE
+  ACTIVITY
+  COMMUNITY
+}
+
+enum VerificationStageStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum VerificationActor {
+  USER
+  ADMIN
+  SYSTEM
+}
+
 enum PostCategory {
   FINTECH
   HEALTH
@@ -79,6 +99,12 @@ model User {
     verificationApplications VerificationApplication[]
     posts                    Post[]
     reviewedVerifications    VerificationApplication[] @relation("VerificationReviewer")
+    
+    // Multi-stage verification
+    verificationStages       VerificationStage[]
+    reviewedStages          VerificationStage[] @relation("StageReviewer")
+    activityMetrics         ActivityMetric?
+    communityMetrics        CommunityMetric?
 }
 
 model Session {
@@ -273,4 +299,95 @@ model OTP {
   attempts  Int      @default(0)
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+// Multi-Stage Verification System
+
+model VerificationStage {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  
+  type        VerificationType
+  status      VerificationStageStatus @default(PENDING)
+  
+  // Metadata stores type-specific verification data as JSON
+  // Examples:
+  // - IDENTITY: { documentType, documentNumber, documentUrls, facePhotoUrl }
+  // - ROLE: { proofType, proofUrls, accreditationData, incorporationDetails }
+  // - ACTIVITY: { score, metrics, lastCalculated }
+  // - COMMUNITY: { trustScore, endorsementCount, reviewScore }
+  metadata    Json?
+  
+  // Audit trail
+  submittedBy VerificationActor @default(USER)
+  reviewedBy  VerificationActor?
+  reviewer    User?    @relation("StageReviewer", fields: [reviewerId], references: [id])
+  reviewerId  String?
+  reviewNote  String?
+  
+  // Auto-expiry for time-limited verifications
+  expiresAt   DateTime?
+  
+  submittedAt DateTime @default(now())
+  reviewedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId, type])
+  @@index([status])
+  @@index([type])
+}
+
+model ActivityMetric {
+  id                    String   @id @default(uuid())
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String   @unique
+  
+  // Interaction metrics
+  conversationsStarted  Int      @default(0)
+  conversationsReceived Int      @default(0)
+  messagesExchanged     Int      @default(0)
+  
+  // Platform engagement
+  postsCreated          Int      @default(0)
+  reviewsGiven          Int      @default(0)
+  reviewsReceived       Int      @default(0)
+  
+  // Investment/Deal metrics (role-specific)
+  dealsInitiated        Int      @default(0)
+  dealsCompleted        Int      @default(0)
+  
+  // Calculated score (0-100)
+  activityScore         Float    @default(0)
+  
+  lastCalculatedAt      DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model CommunityMetric {
+  id                  String   @id @default(uuid())
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId              String   @unique
+  
+  // Trust indicators
+  averageRating       Float    @default(0)
+  totalReviews        Int      @default(0)
+  verifiedReviews     Int      @default(0)
+  
+  // Endorsements (can be from other verified users)
+  endorsementCount    Int      @default(0)
+  endorsedByVerified  Int      @default(0)
+  
+  // Response metrics
+  responseRate        Float    @default(0)
+  averageResponseTime Int?     // in minutes
+  
+  // Calculated trust score (0-100)
+  trustScore          Float    @default(0)
+  
+  lastCalculatedAt    DateTime @default(now())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
