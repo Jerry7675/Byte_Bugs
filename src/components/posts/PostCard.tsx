@@ -172,6 +172,7 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
               <MessageUserButton
                 userId={post.authorId}
                 userName={`${post.author.firstName} ${post.author.lastName}`}
+                userRole={post.author.role}
                 variant="icon"
               />
             )}
