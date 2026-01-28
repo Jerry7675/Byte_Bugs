@@ -58,8 +58,8 @@ export default function VerificationSubmitPage() {
   }
 
   // Check if user already has verification stages
-  const identityStage = stages.find(s => s.type === 'IDENTITY');
-  const roleStage = stages.find(s => s.type === 'ROLE');
+  const identityStage = stages.find((s) => s.type === 'IDENTITY');
+  const roleStage = stages.find((s) => s.type === 'ROLE');
 
   // Helper to get status badge
   const getStatusBadge = (status: string) => {
@@ -71,7 +71,9 @@ export default function VerificationSubmitPage() {
     };
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
     return (
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}>
+      <span
+        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}
+      >
         {config.label}
       </span>
     );
@@ -126,7 +128,7 @@ export default function VerificationSubmitPage() {
             <div className="animate-fadeIn">
               {identityStage && !isEditingIdentity ? (
                 <div className="bg-white rounded-lg shadow overflow-hidden">
-                  <div 
+                  <div
                     className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50"
                     onClick={() => setIsIdentityExpanded(!isIdentityExpanded)}
                   >
@@ -134,16 +136,21 @@ export default function VerificationSubmitPage() {
                       <h2 className="text-2xl font-bold">Identity Verification Status</h2>
                       {getStatusBadge(identityStage.status)}
                     </div>
-                    <svg 
+                    <svg
                       className={`w-6 h-6 text-gray-500 transition-transform ${isIdentityExpanded ? 'rotate-180' : ''}`}
-                      fill="none" 
-                      stroke="currentColor" 
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
-                  
+
                   {isIdentityExpanded && (
                     <div className="px-6 pb-6 space-y-4 border-t border-gray-200 pt-4">
                       <div className="space-y-3">
@@ -157,24 +164,31 @@ export default function VerificationSubmitPage() {
                             {new Date(identityStage.reviewedAt).toLocaleDateString()}
                           </p>
                         )}
-                        
+
                         {/* Display submitted metadata */}
                         <div className="mt-4 p-4 bg-gray-50 rounded">
                           <p className="font-medium text-gray-700 mb-2">Submitted Information:</p>
                           <div className="space-y-2 text-sm text-gray-600">
-                            {identityStage.metadata && typeof identityStage.metadata === 'object' && (
-                              <>
-                                {(identityStage.metadata as any).documentType && (
-                                  <p><span className="font-medium">Document Type:</span> {(identityStage.metadata as any).documentType}</p>
-                                )}
-                                {(identityStage.metadata as any).documentNumber && (
-                                  <p><span className="font-medium">Document Number:</span> {(identityStage.metadata as any).documentNumber}</p>
-                                )}
-                              </>
-                            )}
+                            {identityStage.metadata &&
+                              typeof identityStage.metadata === 'object' && (
+                                <>
+                                  {(identityStage.metadata as any).documentType && (
+                                    <p>
+                                      <span className="font-medium">Document Type:</span>{' '}
+                                      {(identityStage.metadata as any).documentType}
+                                    </p>
+                                  )}
+                                  {(identityStage.metadata as any).documentNumber && (
+                                    <p>
+                                      <span className="font-medium">Document Number:</span>{' '}
+                                      {(identityStage.metadata as any).documentNumber}
+                                    </p>
+                                  )}
+                                </>
+                              )}
                           </div>
                         </div>
-                        
+
                         {identityStage.reviewNote && (
                           <div className="mt-4 p-4 bg-gray-50 rounded">
                             <p className="font-medium text-gray-700 mb-2">Review Note:</p>
@@ -182,7 +196,7 @@ export default function VerificationSubmitPage() {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex gap-3 mt-6">
                         <button
                           onClick={(e) => {
@@ -203,15 +217,12 @@ export default function VerificationSubmitPage() {
                   )}
                 </div>
               ) : isEditingIdentity ? (
-                <IdentityVerificationForm 
+                <IdentityVerificationForm
                   onSuccess={handleSuccess}
-                  initialData={identityStage.metadata}
+                  initialData={identityStage?.metadata}
                 />
               ) : (
-                <IdentityVerificationForm 
-                  onSuccess={handleSuccess} 
-                  initialData={undefined}
-                />
+                <IdentityVerificationForm onSuccess={handleSuccess} initialData={undefined} />
               )}
             </div>
           )}
@@ -220,7 +231,7 @@ export default function VerificationSubmitPage() {
             <div className="animate-fadeIn">
               {roleStage && !isEditingRole ? (
                 <div className="bg-white rounded-lg shadow overflow-hidden">
-                  <div 
+                  <div
                     className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50"
                     onClick={() => setIsRoleExpanded(!isRoleExpanded)}
                   >
@@ -228,16 +239,21 @@ export default function VerificationSubmitPage() {
                       <h2 className="text-2xl font-bold">Role Verification Status</h2>
                       {getStatusBadge(roleStage.status)}
                     </div>
-                    <svg 
+                    <svg
                       className={`w-6 h-6 text-gray-500 transition-transform ${isRoleExpanded ? 'rotate-180' : ''}`}
-                      fill="none" 
-                      stroke="currentColor" 
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
-                  
+
                   {isRoleExpanded && (
                     <div className="px-6 pb-6 space-y-4 border-t border-gray-200 pt-4">
                       <div className="space-y-3">
@@ -251,7 +267,7 @@ export default function VerificationSubmitPage() {
                             {new Date(roleStage.reviewedAt).toLocaleDateString()}
                           </p>
                         )}
-                        
+
                         {/* Display submitted metadata */}
                         <div className="mt-4 p-4 bg-gray-50 rounded">
                           <p className="font-medium text-gray-700 mb-2">Submitted Information:</p>
@@ -259,22 +275,34 @@ export default function VerificationSubmitPage() {
                             {roleStage.metadata && typeof roleStage.metadata === 'object' && (
                               <>
                                 {(roleStage.metadata as any).proofType && (
-                                  <p><span className="font-medium">Proof Type:</span> {(roleStage.metadata as any).proofType}</p>
+                                  <p>
+                                    <span className="font-medium">Proof Type:</span>{' '}
+                                    {(roleStage.metadata as any).proofType}
+                                  </p>
                                 )}
                                 {(roleStage.metadata as any).incorporationNumber && (
-                                  <p><span className="font-medium">Incorporation Number:</span> {(roleStage.metadata as any).incorporationNumber}</p>
+                                  <p>
+                                    <span className="font-medium">Incorporation Number:</span>{' '}
+                                    {(roleStage.metadata as any).incorporationNumber}
+                                  </p>
                                 )}
                                 {(roleStage.metadata as any).firmName && (
-                                  <p><span className="font-medium">Firm Name:</span> {(roleStage.metadata as any).firmName}</p>
+                                  <p>
+                                    <span className="font-medium">Firm Name:</span>{' '}
+                                    {(roleStage.metadata as any).firmName}
+                                  </p>
                                 )}
                                 {(roleStage.metadata as any).companyName && (
-                                  <p><span className="font-medium">Company Name:</span> {(roleStage.metadata as any).companyName}</p>
+                                  <p>
+                                    <span className="font-medium">Company Name:</span>{' '}
+                                    {(roleStage.metadata as any).companyName}
+                                  </p>
                                 )}
                               </>
                             )}
                           </div>
                         </div>
-                        
+
                         {roleStage.reviewNote && (
                           <div className="mt-4 p-4 bg-gray-50 rounded">
                             <p className="font-medium text-gray-700 mb-2">Review Note:</p>
@@ -282,7 +310,7 @@ export default function VerificationSubmitPage() {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex gap-3 mt-6">
                         <button
                           onClick={(e) => {
@@ -303,12 +331,12 @@ export default function VerificationSubmitPage() {
                   )}
                 </div>
               ) : isEditingRole && user.role === 'INVESTOR' ? (
-                <InvestorRoleVerificationForm 
+                <InvestorRoleVerificationForm
                   onSuccess={handleSuccess}
                   initialData={roleStage?.metadata}
                 />
               ) : isEditingRole && user.role === 'STARTUP' ? (
-                <StartupRoleVerificationForm 
+                <StartupRoleVerificationForm
                   onSuccess={handleSuccess}
                   initialData={roleStage?.metadata}
                 />

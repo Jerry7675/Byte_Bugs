@@ -2,6 +2,7 @@
 import { type Post } from '@/client/api/post-api';
 import { useAuth } from '@/context/authContext';
 import Image from 'next/image';
+import { MessageUserButton } from '@/components/messaging/MessageUserButton';
 
 interface PostCardProps {
   post: Post;
@@ -53,7 +54,10 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
   };
 
   const formatPostType = (type: string) => {
-    return type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase());
+    return type
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   return (
@@ -61,12 +65,7 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
       {/* Image */}
       {post.imageUrl && (
         <div className="relative w-full h-64 bg-gray-100">
-          <Image
-            src={post.imageUrl}
-            alt={post.title}
-            fill
-            className="object-cover"
-          />
+          <Image src={post.imageUrl} alt={post.title} fill className="object-cover" />
         </div>
       )}
 
@@ -119,10 +118,7 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
             {post.tags.map((tag, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
-              >
+              <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
                 #{tag}
               </span>
             ))}
@@ -142,7 +138,16 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
               {post.author.firstName} {post.author.lastName}
             </span>
           </div>
-          <span>{formatDate(post.createdAt)}</span>
+          <div className="flex items-center gap-3">
+            <span>{formatDate(post.createdAt)}</span>
+            {!isOwner && (
+              <MessageUserButton
+                userId={post.authorId}
+                userName={`${post.author.firstName} ${post.author.lastName}`}
+                variant="icon"
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { validateSignup } from '../../validators/signupValidation';
 import { PrismaEnums } from '../../../enumWrapper';
 import { logger } from '../../lib/logger';
 import { getContext } from '@/context/context-store';
+import { MessagingService } from '../messaging/messaging.service';
 
 export async function signupUserService(params: {
   email: string;
@@ -146,6 +147,19 @@ export async function loginUserService(params: {
         sameSite: 'lax',
         path: '/',
         maxAge: AccessTokenExpiryMinutes * 60 * 2, // 2 hours for now hai
+      });
+    }
+
+    // Cleanup expired messages on login
+    try {
+      const messagingService = new MessagingService();
+      await messagingService.cleanupExpiredMessages(user.id);
+      logger.info('Cleaned up expired messages on login', { userId: user.id });
+    } catch (cleanupError) {
+      // Don't fail login if cleanup fails
+      logger.error('Failed to cleanup expired messages on login', {
+        userId: user.id,
+        error: cleanupError,
       });
     }
 
