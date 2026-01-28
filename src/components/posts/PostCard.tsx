@@ -4,7 +4,7 @@ import { useAuth } from '@/context/authContext';
 import Image from 'next/image';
 import { MessageUserButton } from '@/components/messaging/MessageUserButton';
 import { useState } from 'react';
-import { ImageIcon } from 'lucide-react';
+import { ImageIcon, Trash2 } from 'lucide-react';
 
 interface PostCardProps {
   post: Post;
@@ -128,9 +128,10 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
           {showActions && isOwner && onDelete && (
             <button
               onClick={() => onDelete(post.id)}
-              className="text-red-600 hover:text-red-800 text-sm font-medium"
+              className="w-9 h-9 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 flex items-center justify-center text-red-600 hover:text-red-700 transition-all duration-25 hover:scale-105"
+              title="Delete post"
             >
-              Delete
+              <Trash2 className="w-4 h-4" />
             </button>
           )}
         </div>
@@ -171,6 +172,7 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
               <MessageUserButton
                 userId={post.authorId}
                 userName={`${post.author.firstName} ${post.author.lastName}`}
+                userRole={post.author.role}
                 variant="icon"
               />
             )}

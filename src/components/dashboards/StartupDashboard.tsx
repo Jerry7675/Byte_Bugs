@@ -18,8 +18,8 @@ export default function StartupDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-6 p-25">
+      {/* <div>
         <h1 className="text-3xl font-bold text-gray-900">Startup Dashboard</h1>
         <p className="mt-2 text-gray-600">Manage your startup, {user?.email}</p>
       </div>
@@ -37,7 +37,7 @@ export default function StartupDashboard() {
           <h3 className="text-sm font-semibold text-orange-900">Messages</h3>
           <p className="mt-2 text-2xl font-bold text-orange-600">0</p>
         </div>
-      </div>
+      </div> */}
 
       {/* Tabs */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">

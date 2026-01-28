@@ -7,6 +7,7 @@ const PUBLIC_ROUTES = [
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
   '/api/auth/otp',
+  '/api/stats',
 ];
 
 export async function proxy(req: NextRequest) {

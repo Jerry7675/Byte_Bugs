@@ -9,10 +9,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 import { createConversation } from '@/client/api/messaging-api';
+import { useAuth } from '@/context/authContext';
+import { toast } from 'sonner';
 
 interface MessageUserButtonProps {
   userId: string;
   userName: string;
+  userRole?: string;
   variant?: 'primary' | 'secondary' | 'icon';
   className?: string;
 }
@@ -20,11 +23,18 @@ interface MessageUserButtonProps {
 export function MessageUserButton({
   userId,
   userName,
+  userRole,
   variant = 'primary',
   className = '',
 }: MessageUserButtonProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  // Don't show button if user has same role or user is not logged in
+  if (!user || (userRole && user.role === userRole)) {
+    return null;
+  }
 
   const handleMessage = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,21 +42,16 @@ export function MessageUserButton({
 
     setLoading(true);
     try {
-      console.log('Creating conversation with user:', userId);
       const response = await createConversation({ receiverId: userId });
-      console.log('Conversation response:', response);
 
       if (response.success && response.data) {
         const conversationId = response.data.id;
-        console.log('Navigating to conversation:', conversationId);
         router.push(`/messages?conversation=${conversationId}`);
       } else {
-        console.error('Failed to create conversation:', response.error);
-        alert(response.error || 'Failed to start conversation');
+        toast.error(response.error || 'Failed to start conversation');
       }
     } catch (error) {
-      console.error('Failed to create conversation:', error);
-      alert(
+      toast.error(
         `Failed to start conversation: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     } finally {

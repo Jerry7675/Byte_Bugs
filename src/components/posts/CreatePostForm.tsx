@@ -20,7 +20,6 @@ export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormPr
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -38,7 +37,6 @@ export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormPr
       }
 
       setImageFile(file);
-      setError('');
       
       // Create preview
       const reader = new FileReader();
@@ -56,7 +54,6 @@ export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -69,7 +66,7 @@ export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormPr
         setUploading(false);
 
         if (!uploadResult.success || !uploadResult.data) {
-          setError(uploadResult.error || 'Failed to upload image');
+          toast.error(uploadResult.error || 'Failed to upload image');
           setLoading(false);
           return;
         }
@@ -104,12 +101,13 @@ export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormPr
         setTags('');
         setImageFile(null);
         setImagePreview(null);
+        toast.success('Post created successfully!');
         onSuccess?.();
       } else {
-        setError(result.error || 'Failed to create post');
+        toast.error(result.error || 'Failed to create post');
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+      toast.error(err.message || 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
@@ -129,12 +127,6 @@ export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormPr
           </button>
         )}
       </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      )}
 
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">

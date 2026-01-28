@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
-import logoImg from '@/(public)/mainlogo.png';
+import logoImg from '@/(public)/logoinvest.png';
 
 const LogoIcon = () => {
   return (
