@@ -9,7 +9,10 @@ import { withRequestContext } from '@/context/init-request-context';
 import { getContext } from '@/context/context-store';
 import { FundingService } from '@/server/services/funding';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> | { id: string } },
+) {
   return withRequestContext(req, async () => {
     const context = getContext();
     if (!context.user) {
@@ -17,7 +20,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 
     try {
-      const agreement = await FundingService.getFundingAgreement(params.id);
+      // Handle both Promise and direct params for Next.js compatibility
+      const resolvedParams = await Promise.resolve(params);
+      const agreement = await FundingService.getFundingAgreement(resolvedParams.id);
 
       return NextResponse.json({
         success: true,

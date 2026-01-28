@@ -66,6 +66,11 @@ export default function PostsFeed({ refreshTrigger, showActions = false }: Posts
     }
   };
 
+  const handleBoost = async (id: string) => {
+    // Reload posts after boosting to reflect changes
+    await loadPosts(1, false);
+  };
+
   const handleLoadMore = () => {
     if (page < totalPages) {
       loadPosts(page + 1, true);
@@ -78,7 +83,10 @@ export default function PostsFeed({ refreshTrigger, showActions = false }: Posts
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
-            <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="category-filter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Category
             </label>
             <select
@@ -162,6 +170,7 @@ export default function PostsFeed({ refreshTrigger, showActions = false }: Posts
                 key={post.id}
                 post={post}
                 onDelete={showActions ? handleDelete : undefined}
+                onBoost={showActions ? handleBoost : undefined}
                 showActions={showActions}
               />
             ))}

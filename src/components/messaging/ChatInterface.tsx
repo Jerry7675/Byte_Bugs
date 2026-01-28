@@ -9,11 +9,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useMessages } from '@/client/hooks/useMessaging';
 import { format, isToday, isYesterday } from 'date-fns';
 import { Send, Clock, CheckCheck } from 'lucide-react';
+import { CreateFundingButton } from '@/components/funding';
 
 interface ChatInterfaceProps {
   conversationId: string;
   currentUserId: string;
   otherUser: {
+    id: string;
     firstName: string;
     lastName: string;
     role: string;
@@ -125,10 +127,23 @@ export function ChatInterface({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 p-4 shrink-0">
-        <h2 className="text-lg font-semibold text-gray-900">
-          {otherUser.firstName} {otherUser.lastName}
-        </h2>
-        <p className="text-sm text-gray-500">{otherUser.role}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {otherUser.firstName} {otherUser.lastName}
+            </h2>
+            <p className="text-sm text-gray-500">{otherUser.role}</p>
+          </div>
+          {(otherUser.role === 'INVESTOR' || otherUser.role === 'STARTUP') && (
+            <CreateFundingButton
+              userId={otherUser.id}
+              userName={`${otherUser.firstName} ${otherUser.lastName}`}
+              userRole={otherUser.role as 'INVESTOR' | 'STARTUP'}
+              variant="secondary"
+              className="text-sm"
+            />
+          )}
+        </div>
       </div>
 
       {/* Messages */}

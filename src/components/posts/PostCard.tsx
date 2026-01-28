@@ -3,12 +3,16 @@ import { type Post } from '@/client/api/post-api';
 import { useAuth } from '@/context/authContext';
 import Image from 'next/image';
 import { MessageUserButton } from '@/components/messaging/MessageUserButton';
+import { CreateFundingButton } from '@/components/funding';
 import { useState } from 'react';
 import { ImageIcon, Trash2 } from 'lucide-react';
+import { TrendingUp, Clock } from 'lucide-react';
+import { boostPost } from '@/client/api/post-api';
 
 interface PostCardProps {
   post: Post;
   onDelete?: (id: string) => void;
+  onBoost?: (id: string) => void;
   showActions?: boolean;
 }
 
@@ -41,10 +45,11 @@ const roleLabels = {
   ADMIN: 'Admin',
 };
 
-export default function PostCard({ post, onDelete, showActions = false }: PostCardProps) {
+export default function PostCard({ post, onDelete, onBoost, showActions = false }: PostCardProps) {
   const { user } = useAuth();
   const isOwner = user?.id === post.authorId;
   const [imageError, setImageError] = useState(false);
+  const [boosting, setBoosting] = useState(false);
 
   const isValidImageUrl = (url: string) => {
     try {
@@ -75,8 +80,71 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
       .replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
+  const handleBoost = async () => {
+    if (!isOwner || boosting) return;
+
+    setBoosting(true);
+    try {
+      const result = await boostPost(post.id);
+      if (result.success) {
+        alert(result.message || 'Post boosted successfully!');
+        if (onBoost) {
+          onBoost(post.id);
+        } else {
+          window.location.reload();
+        }
+      } else {
+        alert(result.error || 'Failed to boost post');
+      }
+    } catch (error) {
+      alert('An error occurred while boosting the post');
+    } finally {
+      setBoosting(false);
+    }
+  };
+
+  const isBoostActive = () => {
+    if (!post.isBoosted || !post.boostExpiresAt) return false;
+    return new Date(post.boostExpiresAt) > new Date();
+  };
+
+  const getTimeRemaining = () => {
+    if (!post.boostExpiresAt) return '';
+    const now = new Date();
+    const expiresAt = new Date(post.boostExpiresAt);
+    const diff = expiresAt.getTime() - now.getTime();
+
+    if (diff <= 0) return 'Expired';
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m left`;
+    }
+    return `${minutes}m left`;
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+    <div
+      className={`bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow ${
+        isBoostActive() ? 'border-yellow-400 border-2 shadow-md' : 'border-gray-200'
+      }`}
+    >
+      {/* Boosted Badge */}
+      {isBoostActive() && (
+        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            <span className="font-semibold text-sm">Boosted Post</span>
+          </div>
+          <div className="flex items-center gap-1 text-sm">
+            <Clock className="w-3 h-3" />
+            <span>{getTimeRemaining()}</span>
+          </div>
+        </div>
+      )}
+
       {/* Image */}
       {post.imageUrl && (
         <div className="relative w-full h-64 bg-gray-100">
@@ -109,7 +177,8 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
             </span>
             <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${
-                categoryColors[post.category as keyof typeof categoryColors] || categoryColors.GENERAL
+                categoryColors[post.category as keyof typeof categoryColors] ||
+                categoryColors.GENERAL
               }`}
             >
               {post.category}
@@ -169,15 +238,48 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
           <div className="flex items-center gap-3">
             <span>{formatDate(post.createdAt)}</span>
             {!isOwner && (
-              <MessageUserButton
-                userId={post.authorId}
-                userName={`${post.author.firstName} ${post.author.lastName}`}
-                userRole={post.author.role}
-                variant="icon"
-              />
+              <>
+                <MessageUserButton
+                  userId={post.authorId}
+                  userName={`${post.author.firstName} ${post.author.lastName}`}
+                  variant="icon"
+                />
+                {(post.author.role === 'INVESTOR' || post.author.role === 'STARTUP') && (
+                  <CreateFundingButton
+                    userId={post.authorId}
+                    userName={`${post.author.firstName} ${post.author.lastName}`}
+                    userRole={post.author.role as 'INVESTOR' | 'STARTUP'}
+                    variant="icon"
+                  />
+                )}
+              </>
             )}
           </div>
         </div>
+
+        {/* Actions for post owner */}
+        {showActions && isOwner && (
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200">
+            {!isBoostActive() && (
+              <button
+                onClick={handleBoost}
+                disabled={boosting}
+                className="flex-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-2 rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <TrendingUp className="w-4 h-4" />
+                {boosting ? 'Boosting...' : 'Boost Post (100 pts)'}
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => onDelete(post.id)}
+                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors"
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

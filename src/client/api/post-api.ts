@@ -2,7 +2,13 @@ export interface CreatePostPayload {
   title: string;
   content: string;
   category: 'FUNDING' | 'TECHNOLOGY' | 'MARKETING' | 'OPERATIONS' | 'GENERAL';
-  postType?: 'FUNDING_REQUEST' | 'INVESTMENT_OFFER' | 'UPDATE' | 'ANNOUNCEMENT' | 'MILESTONE' | 'OTHER';
+  postType?:
+    | 'FUNDING_REQUEST'
+    | 'INVESTMENT_OFFER'
+    | 'UPDATE'
+    | 'ANNOUNCEMENT'
+    | 'MILESTONE'
+    | 'OTHER';
   imageUrl?: string;
   tags?: string[];
 }
@@ -16,6 +22,10 @@ export interface Post {
   category: string;
   postType: string;
   tags: string[];
+  isBoosted: boolean;
+  boostedAt?: string;
+  boostExpiresAt?: string;
+  boostCost?: number;
   createdAt: string;
   updatedAt: string;
   author: {
@@ -69,7 +79,7 @@ export async function uploadImage(file: File): Promise<UploadResponse> {
       body: formData,
       credentials: 'include',
     });
-    
+
     const data = await res.json();
     return data;
   } catch {
@@ -124,7 +134,9 @@ export async function getPosts({
 }
 
 // Get posts by author
-export async function getPostsByAuthor(authorId: string): Promise<{ success: boolean; data?: Post[]; error?: string }> {
+export async function getPostsByAuthor(
+  authorId: string,
+): Promise<{ success: boolean; data?: Post[]; error?: string }> {
   try {
     const res = await fetch(`/api/post/author/${authorId}`, {
       method: 'GET',
@@ -166,12 +178,49 @@ export async function deletePost(id: string): Promise<PostResponse> {
 }
 
 // Update post
-export async function updatePost(id: string, payload: Partial<CreatePostPayload>): Promise<PostResponse> {
+export async function updatePost(
+  id: string,
+  payload: Partial<CreatePostPayload>,
+): Promise<PostResponse> {
   try {
     const res = await fetch(`/api/post/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      credentials: 'include',
+    });
+    const data = await res.json();
+    return data;
+  } catch {
+    return { success: false, error: 'Network error' };
+  }
+}
+
+// Boost post
+export async function boostPost(postId: string): Promise<PostResponse> {
+  try {
+    const res = await fetch('/api/post/boost', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId }),
+      credentials: 'include',
+    });
+    const data = await res.json();
+    return data;
+  } catch {
+    return { success: false, error: 'Network error' };
+  }
+}
+
+// Get boost info (cost and duration)
+export async function getBoostInfo(): Promise<{
+  success: boolean;
+  data?: { cost: number; durationHours: number };
+  error?: string;
+}> {
+  try {
+    const res = await fetch('/api/post/boost', {
+      method: 'GET',
       credentials: 'include',
     });
     const data = await res.json();

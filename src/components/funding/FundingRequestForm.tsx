@@ -127,10 +127,10 @@ export default function FundingRequestForm({
 
         <div>
           <label htmlFor="fundingAmount" className="block text-sm font-medium text-gray-700 mb-2">
-            Funding Amount (USD) <span className="text-red-500">*</span>
+            Funding Amount (NRP) <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <span className="absolute left-4 top-3 text-gray-500">$</span>
+            <span className="absolute left-4 top-3 text-gray-500">₨</span>
             <input
               type="number"
               id="fundingAmount"
@@ -145,7 +145,7 @@ export default function FundingRequestForm({
             />
           </div>
           <p className="mt-2 text-sm text-gray-500">
-            Platform commission: 5% | Net amount: $
+            Platform commission: 5% | Net amount: ₨
             {formData.fundingAmount
               ? (parseFloat(formData.fundingAmount) * 0.95).toFixed(2)
               : '0.00'}
@@ -193,7 +193,7 @@ export default function FundingRequestForm({
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+            className="px-6 py-3 border border-gray-300 rounded-lg text-green-700 hover:bg-gray-50 transition"
             disabled={loading}
           >
             Cancel
