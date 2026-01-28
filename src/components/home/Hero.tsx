@@ -12,9 +12,18 @@ import profilePic3 from '@/(public)/(profile-pics)/3.jpg';
 const HeroSection = () => {
   const router = useRouter();
   const [stats, setStats] = useState({
-    totalStartups: "6",
-    totalInvestors: "4",
+    totalStartups: '6',
+    totalInvestors: '4',
+    totalInvested: 0,
   });
+
+  const formatAmount = (amount: number) => {
+    if (amount === 0) return 'Rs0';
+    if (amount < 1000) return `Rs${amount.toFixed(0)}`;
+    if (amount < 1000000) return `Rs${(amount / 1000).toFixed(1)}K+`;
+    if (amount < 1000000000) return `Rs${(amount / 1000000).toFixed(1)}M+`;
+    return `Rs${(amount / 1000000000).toFixed(1)}B+`;
+  };
 
   useEffect(() => {
     fetch('/api/stats')
@@ -24,6 +33,7 @@ const HeroSection = () => {
           setStats({
             totalStartups: data.data.totalStartups,
             totalInvestors: data.data.totalInvestors,
+            totalInvested: data.data.totalInvested || 0,
           });
         }
       })
@@ -98,7 +108,7 @@ const HeroSection = () => {
             <div className="flex items-center gap-8 pt-4">
               <div className="text-center">
                 <p className="font-display font-bold text-2xl md:text-3xl text-foreground">
-                  $2.5B+
+                  {formatAmount(stats.totalInvested)}
                 </p>
                 <p className="text-sm text-muted-foreground">Total Invested</p>
               </div>
@@ -182,9 +192,27 @@ const HeroSection = () => {
               >
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-green-600 border-2 border-card overflow-hidden"><Image src={profilePic1} alt={'pic-1'} className="w-full h-full object-cover" /></div>
-                    <div className="w-8 h-8 rounded-full bg-green-400 border-2 border-card overflow-hidden"><Image src={profilePic2} alt={'pic-2'} className="w-full h-full object-cover" /></div>
-                    <div className="w-8 h-8 rounded-full bg-green-800 border-2 border-card overflow-hidden"><Image src={profilePic3} alt={'pic-3'} className="w-full h-full object-cover" /></div>
+                    <div className="w-8 h-8 rounded-full bg-green-600 border-2 border-card overflow-hidden">
+                      <Image
+                        src={profilePic1}
+                        alt={'pic-1'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-green-400 border-2 border-card overflow-hidden">
+                      <Image
+                        src={profilePic2}
+                        alt={'pic-2'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-green-800 border-2 border-card overflow-hidden">
+                      <Image
+                        src={profilePic3}
+                        alt={'pic-3'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
                   <p className="text-sm text-green-700">+12 viewing now</p>
                 </div>

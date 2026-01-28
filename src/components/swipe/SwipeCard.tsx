@@ -9,9 +9,13 @@ import {
   Building2,
   TrendingUp,
   User,
+  MessageCircle,
+  DollarSign,
 } from 'lucide-react';
 import Image from 'next/image';
 import type { Profile } from '@/client/hooks/useSwipe';
+import { MessageUserButton } from '@/components/messaging/MessageUserButton';
+import { CreateFundingButton } from '@/components/funding';
 
 interface SwipeCardProps {
   profile: Profile;
@@ -190,6 +194,23 @@ export function SwipeCard({ profile, onSwipe, style }: SwipeCardProps) {
                 <span>Activity Score: {profile.activityMetrics.activityScore}/100</span>
               </div>
             )}
+
+            {/* Quick Actions */}
+            <div className="flex items-center gap-2 pt-3 border-t border-gray-200 mt-3">
+              <MessageUserButton
+                userId={profile.id}
+                userName={`${profile.firstName} ${profile.lastName}`}
+                variant="secondary"
+                className="flex-1 text-sm"
+              />
+              <CreateFundingButton
+                userId={profile.id}
+                userName={`${profile.firstName} ${profile.lastName}`}
+                userRole={profile.role as 'INVESTOR' | 'STARTUP'}
+                variant="secondary"
+                className="flex-1 text-sm"
+              />
+            </div>
           </div>
         </div>
       </div>

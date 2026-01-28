@@ -177,14 +177,20 @@ export default function FundingAgreementDetail({
 
   const isInitiator = agreement.initiatorId === currentUserId;
   const isCounterparty = agreement.counterpartyId === currentUserId;
+
+  // Only counterparty can accept/reject the funding request
   const canAccept =
     isCounterparty &&
     (agreement.status === 'PENDING_INVESTOR' || agreement.status === 'PENDING_STARTUP');
+
+  // Only counterparty (recipient) can reject, NOT the initiator who created it
   const canReject =
-    (isInitiator || isCounterparty) &&
+    isCounterparty &&
     (agreement.status === 'PENDING_INVESTOR' ||
       agreement.status === 'PENDING_STARTUP' ||
       agreement.status === 'ACCEPTED');
+
+  // Only initiator can cancel before counterparty accepts
   const canCancel =
     isInitiator &&
     (agreement.status === 'PENDING_INVESTOR' || agreement.status === 'PENDING_STARTUP');

@@ -126,8 +126,8 @@ const Footer = () => {
         </div>
 
         <div className="pt-8 border-t border-green-200 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-green-700 text-sm">© 2024 InvestLink. All rights reserved.</p>
-          <p className="text-green-700 text-sm">Made with ❤️ for entrepreneurs worldwide</p>
+          <p className="text-green-700 text-sm">© 2026 InvestLink. All rights reserved.</p>
+          <p className="text-green-700 text-sm">Made By Team Byte Bugs</p>
         </div>
       </div>
     </footer>

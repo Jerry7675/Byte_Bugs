@@ -9,7 +9,10 @@ import { withRequestContext } from '@/context/init-request-context';
 import { getContext } from '@/context/context-store';
 import { FundingService } from '@/server/services/funding';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> | { id: string } },
+) {
   return withRequestContext(req, async () => {
     const context = getContext();
     if (!context.user) {
@@ -20,8 +23,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       const body = await req.json();
       const { reason } = body;
 
+      const resolvedParams = await Promise.resolve(params);
       const agreement = await FundingService.cancelFundingAgreement({
-        agreementId: params.id,
+        agreementId: resolvedParams.id,
         reason,
       });
 

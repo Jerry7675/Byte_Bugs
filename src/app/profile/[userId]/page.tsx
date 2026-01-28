@@ -26,7 +26,8 @@ import { VerificationBadge, VerificationStagesBadge } from '@/components/profile
 import { CategoryTags } from '@/components/profile/CategoryTags';
 import { ProfileStats } from '@/components/profile/ProfileStats';
 import { PostHistoryList } from '@/components/profile/PostHistoryList';
-import { FundingHistory } from '@/components/funding';
+import { FundingHistory, CreateFundingButton } from '@/components/funding';
+import { MessageUserButton } from '@/components/messaging/MessageUserButton';
 
 interface ProfileData {
   user: {
@@ -215,6 +216,21 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
+
+              {/* Action Buttons */}
+              {!isOwner && currentUser && (
+                <div className="flex items-center gap-3">
+                  <MessageUserButton userId={userId} userName={fullName} variant="secondary" />
+                  {(isInvestor || isStartup) && (
+                    <CreateFundingButton
+                      userId={userId}
+                      userName={fullName}
+                      userRole={profile.user.role as 'INVESTOR' | 'STARTUP'}
+                      variant="primary"
+                    />
+                  )}
+                </div>
+              )}
 
               {/* Edit Button */}
               {isOwner && (

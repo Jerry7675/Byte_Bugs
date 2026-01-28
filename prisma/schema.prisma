@@ -336,12 +336,20 @@ model Post {
   category    CategoryType
   postType    PostType     @default(UPDATE)
   tags        String[]     @default([])
+  
+  // Boost feature fields
+  isBoosted   Boolean      @default(false)
+  boostedAt   DateTime?
+  boostExpiresAt DateTime?
+  boostCost   Int?         // Points spent on boost
+  
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   
   @@index([authorId])
   @@index([category])
   @@index([postType])
+  @@index([isBoosted, boostExpiresAt])
 }
 
 model AdminAction {
