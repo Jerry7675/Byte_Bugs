@@ -72,7 +72,7 @@ export default function LoginForm() {
         if (rest && typeof window !== 'undefined') {
           window.dispatchEvent(new Event('authChanged'));
         }
-        router.push('/profile');
+        router.push('/dashboard');
       } else {
         setResult('Error: ' + (result.error || 'Unknown error'));
       }

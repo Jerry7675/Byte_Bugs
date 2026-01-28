@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { ImageIcon, Trash2 } from 'lucide-react';
 import { TrendingUp, Clock } from 'lucide-react';
 import { boostPost } from '@/client/api/post-api';
+import { toast } from 'sonner';
 
 interface PostCardProps {
   post: Post;
@@ -87,17 +88,17 @@ export default function PostCard({ post, onDelete, onBoost, showActions = false 
     try {
       const result = await boostPost(post.id);
       if (result.success) {
-        alert(result.message || 'Post boosted successfully!');
+        toast.success(result.message || 'Post boosted successfully!');
         if (onBoost) {
           onBoost(post.id);
         } else {
           window.location.reload();
         }
       } else {
-        alert(result.error || 'Failed to boost post');
+        toast.error(result.error || 'Failed to boost post');
       }
     } catch (error) {
-      alert('An error occurred while boosting the post');
+      toast.error('An error occurred while boosting the post');
     } finally {
       setBoosting(false);
     }

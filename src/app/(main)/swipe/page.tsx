@@ -16,6 +16,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Users, TrendingUp, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function SwipePage() {
   const router = useRouter();
@@ -75,14 +76,14 @@ export default function SwipePage() {
         refetch();
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to perform swipe');
+      toast.error(err.message || 'Failed to perform swipe');
     }
   };
 
   const handleUndo = async () => {
     try {
       const result = await undoSkip();
-      alert(`Undo successful! ${result.pointsSpent} points spent.`);
+      toast.success(`Undo successful! ${result.pointsSpent} points spent.`);
 
       // Refetch data first to get updated profiles
       await refetch();
@@ -101,16 +102,16 @@ export default function SwipePage() {
 
       // Handle specific error cases gracefully
       if (errorMessage.includes('Undo window expired')) {
-        // Just refresh quota to hide the undo button, don't show alert
+        // Just refresh quota to hide the undo button, don't show toast
         refetchQuota();
         console.log('Undo window expired');
       } else if (errorMessage.includes('No recent skip')) {
         refetchQuota();
         console.log('No recent skip to undo');
       } else if (errorMessage.includes('Insufficient points')) {
-        alert('You need more points to undo. Please add points to your wallet.');
+        toast.error('You need more points to undo. Please add points to your wallet.');
       } else {
-        alert(errorMessage);
+        toast.error(errorMessage);
       }
     }
   };

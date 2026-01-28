@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSubmitVerification } from '@/client/hooks/useVerification';
+import { toast } from 'sonner';
 
 export function IdentityVerificationForm({
   onSuccess,
@@ -49,7 +50,7 @@ export function IdentityVerificationForm({
         },
       });
 
-      alert('Identity verification submitted successfully!');
+      toast.success('Identity verification submitted successfully!');
       onSuccess?.();
     } catch (err) {
       // Error is already set in the hook
@@ -248,7 +249,7 @@ export function InvestorRoleVerificationForm({
         },
       });
 
-      alert('Role verification submitted successfully!');
+      toast.success('Role verification submitted successfully!');
       onSuccess?.();
     } catch (err) {
       console.error('Failed to submit verification:', err);
@@ -392,7 +393,7 @@ export function StartupRoleVerificationForm({
         },
       });
 
-      alert('Role verification submitted successfully!');
+      toast.success('Role verification submitted successfully!');
       onSuccess?.();
     } catch (err) {
       console.error('Failed to submit verification:', err);

@@ -4,7 +4,7 @@ import { LogoWithText } from '../ui/logo';
 
 const Footer = () => {
   return (
-    <footer className="bg-green-50 text-green-900 py-16">
+    <footer className="bg-green-50 text-green-900 py-16 border-t border-green-200">
       {/* if we want to add top border add: border-t border-border/50 */}
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
