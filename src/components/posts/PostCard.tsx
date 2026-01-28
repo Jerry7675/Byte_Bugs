@@ -13,10 +13,11 @@ interface PostCardProps {
 }
 
 const categoryColors = {
-  FINTECH: 'bg-blue-100 text-blue-800',
-  HEALTH: 'bg-green-100 text-green-800',
-  AI: 'bg-purple-100 text-purple-800',
-  OTHER: 'bg-gray-100 text-gray-800',
+  FUNDING: 'bg-blue-100 text-blue-800',
+  TECHNOLOGY: 'bg-purple-100 text-purple-800',
+  MARKETING: 'bg-pink-100 text-pink-800',
+  OPERATIONS: 'bg-orange-100 text-orange-800',
+  GENERAL: 'bg-gray-100 text-gray-800',
 };
 
 const postTypeColors = {
@@ -108,7 +109,7 @@ export default function PostCard({ post, onDelete, showActions = false }: PostCa
             </span>
             <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${
-                categoryColors[post.category as keyof typeof categoryColors] || categoryColors.OTHER
+                categoryColors[post.category as keyof typeof categoryColors] || categoryColors.GENERAL
               }`}
             >
               {post.category}

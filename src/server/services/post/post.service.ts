@@ -12,7 +12,7 @@ export class PostService {
   }: {
     title: string;
     content: string;
-    category: keyof typeof PrismaEnums.PostCategory;
+    category: keyof typeof PrismaEnums.CategoryType;
     postType?: keyof typeof PrismaEnums.PostType;
     imageUrl?: string;
     tags?: string[];
@@ -42,7 +42,7 @@ export class PostService {
         authorId: user.id,
         title,
         content,
-        category: PrismaEnums.PostCategory[category],
+        category: PrismaEnums.CategoryType[category],
         postType: postType ? PrismaEnums.PostType[postType] : PrismaEnums.PostType.UPDATE,
         imageUrl,
         tags: tags || [],
@@ -70,13 +70,13 @@ export class PostService {
   }: {
     page?: number;
     limit?: number;
-    category?: keyof typeof PrismaEnums.PostCategory;
+    category?: keyof typeof PrismaEnums.CategoryType;
     postType?: keyof typeof PrismaEnums.PostType;
   } = {}) {
     const { prisma } = getContext();
     
     const where: any = {};
-    if (category) where.category = PrismaEnums.PostCategory[category];
+    if (category) where.category = PrismaEnums.CategoryType[category];
     if (postType) where.postType = PrismaEnums.PostType[postType];
     
     const skip = (page - 1) * limit;
@@ -180,7 +180,7 @@ export class PostService {
     id: string;
     title?: string;
     content?: string;
-    category?: keyof typeof PrismaEnums.PostCategory;
+    category?: keyof typeof PrismaEnums.CategoryType;
     postType?: keyof typeof PrismaEnums.PostType;
     imageUrl?: string;
     tags?: string[];
@@ -199,7 +199,7 @@ export class PostService {
     const data: any = {};
     if (title !== undefined) data.title = title;
     if (content !== undefined) data.content = content;
-    if (category) data.category = PrismaEnums.PostCategory[category];
+    if (category) data.category = PrismaEnums.CategoryType[category];
     if (postType) data.postType = PrismaEnums.PostType[postType];
     if (imageUrl !== undefined) data.imageUrl = imageUrl;
     if (tags !== undefined) data.tags = tags;

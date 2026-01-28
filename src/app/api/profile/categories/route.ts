@@ -9,7 +9,7 @@ import { withRequestContext } from '@/context/init-request-context';
 export async function GET(req: NextRequest) {
   return withRequestContext(req, async () => {
     try {
-      const categories = await ProfileService.getCategories();
+      const categories = ProfileService.getCategories();
       return NextResponse.json({ success: true, data: categories });
     } catch (error: any) {
       return NextResponse.json(

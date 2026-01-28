@@ -13,7 +13,7 @@ interface CreatePostFormProps {
 export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState<'FINTECH' | 'HEALTH' | 'AI' | 'OTHER'>('FINTECH');
+  const [category, setCategory] = useState<'FUNDING' | 'TECHNOLOGY' | 'MARKETING' | 'OPERATIONS' | 'GENERAL'>('GENERAL');
   const [postType, setPostType] = useState<'FUNDING_REQUEST' | 'INVESTMENT_OFFER' | 'UPDATE' | 'ANNOUNCEMENT' | 'MILESTONE' | 'OTHER'>('UPDATE');
   const [tags, setTags] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -99,7 +99,7 @@ export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormPr
         // Reset form
         setTitle('');
         setContent('');
-        setCategory('FINTECH');
+        setCategory('GENERAL');
         setPostType('UPDATE');
         setTags('');
         setImageFile(null);
@@ -164,10 +164,11 @@ export default function CreatePostForm({ onSuccess, onCancel }: CreatePostFormPr
             onChange={(e) => setCategory(e.target.value as any)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="FINTECH">FinTech</option>
-            <option value="HEALTH">Health</option>
-            <option value="AI">AI</option>
-            <option value="OTHER">Other</option>
+            <option value="FUNDING">Funding</option>
+            <option value="TECHNOLOGY">Technology</option>
+            <option value="MARKETING">Marketing</option>
+            <option value="OPERATIONS">Operations</option>
+            <option value="GENERAL">General</option>
           </select>
         </div>
 

@@ -88,10 +88,11 @@ export default function PostsFeed({ refreshTrigger, showActions = false }: Posts
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
             >
               <option value="">All Categories</option>
-              <option value="FINTECH">FinTech</option>
-              <option value="HEALTH">Health</option>
-              <option value="AI">AI</option>
-              <option value="OTHER">Other</option>
+              <option value="FUNDING">Funding</option>
+              <option value="TECHNOLOGY">Technology</option>
+              <option value="MARKETING">Marketing</option>
+              <option value="OPERATIONS">Operations</option>
+              <option value="GENERAL">General</option>
             </select>
           </div>
 

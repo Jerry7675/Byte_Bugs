@@ -40,11 +40,12 @@ enum VerificationActor {
   SYSTEM
 }
 
-enum PostCategory {
-  FINTECH
-  HEALTH
-  AI
-  OTHER
+enum CategoryType {
+  FUNDING
+  TECHNOLOGY
+  MARKETING
+  OPERATIONS
+  GENERAL
 }
 
 enum PostType {
@@ -176,7 +177,7 @@ model InvestorProfile {
   kycDocumentNumber String?
   kycDocumentUrl String? // URL or path to uploaded KYC document
 
-  categories  Category[] @relation("InvestorCategories")
+  categories  CategoryType[] @default([])
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -198,7 +199,7 @@ model StartupProfile {
   kycDocumentNumber String?
   kycDocumentUrl String? // URL or path to uploaded KYC document
 
-  categories  Category[] @relation("StartupCategories")
+  categories  CategoryType[] @default([])
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -294,7 +295,7 @@ model Post {
   title       String
   content     String
   imageUrl    String?      // Supabase S3 URL
-  category    PostCategory
+  category    CategoryType
   postType    PostType     @default(UPDATE)
   tags        String[]     @default([])
   createdAt   DateTime     @default(now())
@@ -303,14 +304,6 @@ model Post {
   @@index([authorId])
   @@index([category])
   @@index([postType])
-}
-
-model Category {
-  id        String @id @default(uuid())
-  name      String @unique
-
-  investors InvestorProfile[] @relation("InvestorCategories")
-  startups  StartupProfile[]  @relation("StartupCategories")
 }
 
 model AdminAction {

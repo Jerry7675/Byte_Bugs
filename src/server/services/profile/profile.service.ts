@@ -32,7 +32,7 @@ export interface ProfileData {
     name?: string | null;
     stage?: string | null;
   };
-  categories: Array<{ id: string; name: string }>;
+  categories: string[];
   stats: {
     postsCount: number;
     activeHours: number;
@@ -59,7 +59,7 @@ export interface UpdateProfileInput {
   name?: string;
   stage?: string;
   // Categories
-  categoryIds?: string[];
+  categories?: string[];
 }
 
 export class ProfileService {
@@ -81,16 +81,8 @@ export class ProfileService {
         isVerified: true,
         verifiedAt: true,
         createdAt: true,
-        investor: {
-          include: {
-            categories: true,
-          },
-        },
-        startup: {
-          include: {
-            categories: true,
-          },
-        },
+        investor: true,
+        startup: true,
         verificationStages: {
           where: {
             status: PrismaEnums.VerificationStageStatus.APPROVED,
@@ -151,7 +143,29 @@ export class ProfileService {
         verifiedAt: user.verifiedAt,
         createdAt: user.createdAt,
       },
-      profile: profile || {},
+      profile: profile ? {
+        id: profile.id,
+        bio: profile.bio,
+        description: 'description' in profile ? profile.description : null,
+        photo: profile.photo,
+        website: profile.website,
+        firmName: 'firmName' in profile ? profile.firmName : null,
+        minTicket: 'minTicket' in profile ? profile.minTicket : null,
+        maxTicket: 'maxTicket' in profile ? profile.maxTicket : null,
+        name: 'name' in profile ? profile.name : null,
+        stage: 'stage' in profile ? profile.stage : null,
+      } : {
+        id: '',
+        bio: null,
+        description: null,
+        photo: null,
+        website: null,
+        firmName: null,
+        minTicket: null,
+        maxTicket: null,
+        name: null,
+        stage: null,
+      },
       categories,
       stats: {
         postsCount,
@@ -219,7 +233,7 @@ export class ProfileService {
     if (!user) throw new Error('Not authenticated');
 
     // Separate categories from other fields
-    const { categoryIds, ...profileData } = input;
+    const { categories, ...profileData } = input;
 
     // Update based on role
     if (user.role === PrismaEnums.UserRole.INVESTOR) {
@@ -233,14 +247,10 @@ export class ProfileService {
 
       const createData: any = { ...updateData, userId: user.id };
 
-      // Handle categories differently for create vs update
-      if (categoryIds !== undefined) {
-        createData.categories = {
-          connect: categoryIds.map((id) => ({ id })),
-        };
-        updateData.categories = {
-          set: categoryIds.map((id) => ({ id })),
-        };
+      // Handle categories as enum array
+      if (categories !== undefined) {
+        updateData.categories = categories;
+        createData.categories = categories;
       }
 
       await prisma.investorProfile.upsert({
@@ -257,20 +267,18 @@ export class ProfileService {
       if (profileData.name !== undefined) updateData.name = profileData.name;
       if (profileData.stage !== undefined) updateData.stage = profileData.stage;
 
+      // Get user for default name
+      const fullUser = await prisma.user.findUnique({ where: { id: user.id } });
       const createData: any = {
         ...updateData,
         userId: user.id,
-        name: profileData.name || `${user.firstName} ${user.lastName}'s Startup`,
+        name: profileData.name || `${fullUser?.firstName || 'User'} ${fullUser?.lastName || ''}'s Startup`.trim(),
       };
 
-      // Handle categories differently for create vs update
-      if (categoryIds !== undefined) {
-        createData.categories = {
-          connect: categoryIds.map((id) => ({ id })),
-        };
-        updateData.categories = {
-          set: categoryIds.map((id) => ({ id })),
-        };
+      // Handle categories as enum array
+      if (categories !== undefined) {
+        updateData.categories = categories;
+        createData.categories = categories;
       }
 
       await prisma.startupProfile.upsert({
@@ -313,10 +321,13 @@ export class ProfileService {
   /**
    * Get all available categories
    */
-  static async getCategories() {
-    const { prisma } = getContext();
-    return prisma.category.findMany({
-      orderBy: { name: 'asc' },
-    });
+  static getCategories() {
+    return [
+      { id: 'FUNDING', name: 'Funding' },
+      { id: 'TECHNOLOGY', name: 'Technology' },
+      { id: 'MARKETING', name: 'Marketing' },
+      { id: 'OPERATIONS', name: 'Operations' },
+      { id: 'GENERAL', name: 'General' },
+    ];
   }
 }

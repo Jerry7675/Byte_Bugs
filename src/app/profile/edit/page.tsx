@@ -32,7 +32,7 @@ interface ProfileData {
     name?: string | null;
     stage?: string | null;
   };
-  categories: Category[];
+  categories: string[];
 }
 
 export default function EditProfilePage() {
@@ -89,7 +89,7 @@ export default function EditProfilePage() {
         setMaxTicket(p.profile.maxTicket?.toString() || '');
         setStartupName(p.profile.name || '');
         setStage(p.profile.stage || '');
-        setSelectedCategories(p.categories.map((c: Category) => c.id));
+        setSelectedCategories(p.categories || []);
       }
 
       if (categoriesData.success) {
@@ -111,7 +111,7 @@ export default function EditProfilePage() {
         bio,
         website,
         photo,
-        categoryIds: selectedCategories,
+        categories: selectedCategories,
       };
 
       if (profile?.user.role === 'INVESTOR') {
@@ -356,7 +356,7 @@ export default function EditProfilePage() {
                 ))}
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                Select categories that match your interests or expertise
+                Select categories that match your interests or startup focus
               </p>
             </div>
 

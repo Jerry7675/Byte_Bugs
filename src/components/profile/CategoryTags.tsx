@@ -3,15 +3,18 @@
  * Displays category badges
  */
 
-interface Category {
-  id: string;
-  name: string;
-}
-
 interface CategoryTagsProps {
-  categories: Category[];
+  categories: string[];
   max?: number;
 }
+
+const categoryLabels: Record<string, string> = {
+  FUNDING: 'Funding',
+  TECHNOLOGY: 'Technology',
+  MARKETING: 'Marketing',
+  OPERATIONS: 'Operations',
+  GENERAL: 'General',
+};
 
 export function CategoryTags({ categories, max }: CategoryTagsProps) {
   const displayCategories = max ? categories.slice(0, max) : categories;
@@ -27,10 +30,10 @@ export function CategoryTags({ categories, max }: CategoryTagsProps) {
     <div className="flex flex-wrap gap-2">
       {displayCategories.map((category) => (
         <span
-          key={category.id}
+          key={category}
           className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
         >
-          {category.name}
+          {categoryLabels[category] || category}
         </span>
       ))}
       {remaining > 0 && (
