@@ -60,6 +60,15 @@ export async function signupUserService(params: {
         phoneNumber,
       },
     });
+
+    // Create wallet for new user with starting balance of 100 points
+    await prisma.pointsWallet.create({
+      data: {
+        userId: user.id,
+        balance: 100,
+      },
+    });
+
     return {
       success: true,
       user: {

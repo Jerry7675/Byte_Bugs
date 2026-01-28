@@ -115,6 +115,7 @@ export default function ProfileForm({ userRole, userId }: { userRole: string; us
           currentImage={formData.photo}
           onUploadSuccess={handleImageUpload}
           label={userRole === 'INVESTOR' ? 'Profile Photo' : 'Startup Logo'}
+          isCompany={userRole === 'STARTUP'}
         />
 
         {userRole === 'INVESTOR' && (

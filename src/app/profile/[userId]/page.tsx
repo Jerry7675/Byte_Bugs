@@ -26,6 +26,7 @@ import { VerificationBadge, VerificationStagesBadge } from '@/components/profile
 import { CategoryTags } from '@/components/profile/CategoryTags';
 import { ProfileStats } from '@/components/profile/ProfileStats';
 import { PostHistoryList } from '@/components/profile/PostHistoryList';
+import { FundingHistory } from '@/components/funding';
 
 interface ProfileData {
   user: {
@@ -75,6 +76,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
+  const [activeTab, setActiveTab] = useState<'posts' | 'funding'>('posts');
 
   const isOwner = currentUser?.id === userId;
 
@@ -144,7 +146,8 @@ export default function ProfilePage() {
     }
   };
 
-  const hasValidPhoto = profile.profile.photo && isValidImageUrl(profile.profile.photo) && !imageError;
+  const hasValidPhoto =
+    profile.profile.photo && isValidImageUrl(profile.profile.photo) && !imageError;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4">
@@ -203,6 +206,7 @@ export default function ProfilePage() {
                     <VerificationBadge
                       isVerified={profile.user.isVerified}
                       verifiedAt={profile.user.verifiedAt}
+                      stages={profile.verificationStages}
                     />
                     <VerificationStagesBadge stages={profile.verificationStages} />
                   </div>
@@ -278,7 +282,7 @@ export default function ProfilePage() {
             {profile.categories.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Categories</h3>
-                <CategoryTags categories={profile.categories} />
+                <CategoryTags categories={profile.categories.map((c) => c.name)} />
               </div>
             )}
 
@@ -299,10 +303,50 @@ export default function ProfilePage() {
           joinedDays={profile.stats.joinedDays}
         />
 
-        {/* Posts */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Posts</h2>
-          <PostHistoryList userId={userId} />
+        {/* Tabs Navigation */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="border-b border-gray-200">
+            <div className="flex space-x-8 px-6">
+              <button
+                onClick={() => setActiveTab('posts')}
+                className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'posts'
+                    ? 'border-green-600 text-green-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Posts
+              </button>
+              {(isInvestor || isStartup) && (
+                <button
+                  onClick={() => setActiveTab('funding')}
+                  className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === 'funding'
+                      ? 'border-green-600 text-green-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Funding History
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-6 md:p-8">
+            {activeTab === 'posts' && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Posts</h2>
+                <PostHistoryList userId={userId} />
+              </div>
+            )}
+
+            {activeTab === 'funding' && (isInvestor || isStartup) && (
+              <div>
+                <FundingHistory userId={userId} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

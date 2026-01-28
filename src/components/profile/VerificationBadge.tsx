@@ -3,15 +3,26 @@
  * Shows verification status with visual indicator
  */
 
-import { CheckCircle, Clock, XCircle } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, Shield, Award, TrendingUp, Users } from 'lucide-react';
 
 interface VerificationBadgeProps {
   isVerified: boolean;
   verifiedAt?: Date | null;
   size?: 'sm' | 'md' | 'lg';
+  stages?: {
+    identity?: { status: string; reviewedAt?: Date | null };
+    role?: { status: string; reviewedAt?: Date | null };
+    activity?: { status: string };
+    community?: { status: string };
+  };
 }
 
-export function VerificationBadge({ isVerified, verifiedAt, size = 'md' }: VerificationBadgeProps) {
+export function VerificationBadge({
+  isVerified,
+  verifiedAt,
+  size = 'md',
+  stages,
+}: VerificationBadgeProps) {
   const sizeClasses = {
     sm: 'text-xs px-2 py-1',
     md: 'text-sm px-3 py-1.5',
@@ -24,7 +35,13 @@ export function VerificationBadge({ isVerified, verifiedAt, size = 'md' }: Verif
     lg: 'w-5 h-5',
   };
 
-  if (!isVerified) {
+  // Check if main two verifications (identity and role) are approved
+  const identityApproved = stages?.identity?.status === 'APPROVED';
+  const roleApproved = stages?.role?.status === 'APPROVED';
+  const mainVerificationsComplete = identityApproved && roleApproved;
+
+  // Don't show unverified badge if main verifications are complete
+  if (!isVerified && !mainVerificationsComplete) {
     return (
       <span
         className={`inline-flex items-center gap-1.5 rounded-full bg-gray-100 text-gray-700 font-medium ${sizeClasses[size]}`}
@@ -35,15 +52,20 @@ export function VerificationBadge({ isVerified, verifiedAt, size = 'md' }: Verif
     );
   }
 
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-800 font-medium ${sizeClasses[size]}`}
-      title={verifiedAt ? `Verified on ${new Date(verifiedAt).toLocaleDateString()}` : 'Verified'}
-    >
-      <CheckCircle className={iconSizes[size]} />
-      Verified
-    </span>
-  );
+  // If main verifications are complete or user is verified, show verified badge
+  if (isVerified || mainVerificationsComplete) {
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-800 font-medium ${sizeClasses[size]}`}
+        title={verifiedAt ? `Verified on ${new Date(verifiedAt).toLocaleDateString()}` : 'Verified'}
+      >
+        <CheckCircle className={iconSizes[size]} />
+        Verified
+      </span>
+    );
+  }
+
+  return null;
 }
 
 interface VerificationStagesBadgeProps {
@@ -58,30 +80,55 @@ interface VerificationStagesBadgeProps {
 export function VerificationStagesBadge({ stages }: VerificationStagesBadgeProps) {
   if (!stages) return null;
 
-  const approvedStages = Object.values(stages).filter((s) => s?.status === 'APPROVED').length;
-  const totalStages = 4;
+  const identityApproved = stages.identity?.status === 'APPROVED';
+  const roleApproved = stages.role?.status === 'APPROVED';
+  const activityApproved = stages.activity?.status === 'APPROVED';
+  const communityApproved = stages.community?.status === 'APPROVED';
 
-  const getColor = () => {
-    if (approvedStages === totalStages) return 'bg-green-100 text-green-800';
-    if (approvedStages >= 2) return 'bg-blue-100 text-blue-800';
-    if (approvedStages >= 1) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-gray-100 text-gray-700';
-  };
+  // Don't show if main verifications aren't complete
+  if (!identityApproved || !roleApproved) {
+    return null;
+  }
+
+  const extraBadges = [];
+
+  if (activityApproved) {
+    extraBadges.push({
+      key: 'activity',
+      icon: <TrendingUp className="w-3.5 h-3.5" />,
+      label: 'Active Member',
+      color: 'bg-blue-100 text-blue-800',
+      tooltip: 'Verified for consistent activity',
+    });
+  }
+
+  if (communityApproved) {
+    extraBadges.push({
+      key: 'community',
+      icon: <Users className="w-3.5 h-3.5" />,
+      label: 'Community Champion',
+      color: 'bg-purple-100 text-purple-800',
+      tooltip: 'Verified for community contributions',
+    });
+  }
+
+  // If no extra badges, don't show anything
+  if (extraBadges.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="flex items-center gap-2">
-      <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${getColor()}`}>
-        {approvedStages === totalStages ? (
-          <>
-            <CheckCircle className="w-4 h-4" />
-            Fully Verified
-          </>
-        ) : (
-          <>
-            {approvedStages}/{totalStages} Stages Complete
-          </>
-        )}
-      </span>
+    <div className="flex flex-wrap items-center gap-2">
+      {extraBadges.map((badge) => (
+        <span
+          key={badge.key}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${badge.color}`}
+          title={badge.tooltip}
+        >
+          {badge.icon}
+          {badge.label}
+        </span>
+      ))}
     </div>
   );
 }

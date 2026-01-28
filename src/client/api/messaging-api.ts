@@ -224,3 +224,29 @@ export async function getQuotaStatus(): Promise<{
     };
   }
 }
+/**
+ * Get unread message count
+ */
+export async function getUnreadCount(): Promise<{
+  success: boolean;
+  data?: { count: number };
+  error?: string;
+}> {
+  try {
+    const response = await fetch('/api/messages/unread-count', {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return { success: false, error: error.error || 'Failed to fetch unread count' };
+    }
+
+    return await response.json();
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || 'Network error',
+    };
+  }
+}

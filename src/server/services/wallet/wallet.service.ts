@@ -196,8 +196,15 @@ export class WalletService {
     const { userId } = params;
     if (!userId) throw new Error('userId required');
     const { prisma } = getContext();
-    const wallet = await prisma.pointsWallet.findUnique({ where: { userId } });
-    if (!wallet) throw new Error('Wallet not found');
+    let wallet = await prisma.pointsWallet.findUnique({ where: { userId } });
+
+    // Auto-create wallet for existing users who don't have one
+    if (!wallet) {
+      wallet = await prisma.pointsWallet.create({
+        data: { userId, balance: 0 },
+      });
+    }
+
     return { userId, balance: wallet.balance };
   }
 

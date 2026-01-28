@@ -4,11 +4,14 @@ import { useAuth } from '@/context/authContext';
 import CreatePostForm from '@/components/posts/CreatePostForm';
 import PostsFeed from '@/components/posts/PostsFeed';
 import { Button } from '@/components/ui/button';
+import { FundingAgreementsList } from '@/components/funding';
+import Link from 'next/link';
 
 export default function InvestorDashboard() {
   const { user } = useAuth();
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [activeTab, setActiveTab] = useState<'feed' | 'funding'>('feed');
 
   const handlePostCreated = () => {
     setShowCreatePost(false);
@@ -37,26 +40,64 @@ export default function InvestorDashboard() {
         </div>
       </div>
 
-      {/* Posting System */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Community Feed</h2>
-          <Button
-            onClick={() => setShowCreatePost(!showCreatePost)}
-            variant={showCreatePost ? 'outline' : 'default'}
-          >
-            {showCreatePost ? 'Cancel' : '+ Create Post'}
-          </Button>
+      {/* Tabs */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="border-b border-gray-200">
+          <div className="flex space-x-8 px-6">
+            <button
+              onClick={() => setActiveTab('feed')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'feed'
+                  ? 'border-green-600 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Community Feed
+            </button>
+            <button
+              onClick={() => setActiveTab('funding')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'funding'
+                  ? 'border-green-600 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Funding Agreements
+            </button>
+          </div>
         </div>
 
-        {showCreatePost && (
-          <CreatePostForm
-            onSuccess={handlePostCreated}
-            onCancel={() => setShowCreatePost(false)}
-          />
-        )}
+        {/* Tab Content */}
+        <div className="p-6">
+          {activeTab === 'feed' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Community Feed</h2>
+                <Button
+                  onClick={() => setShowCreatePost(!showCreatePost)}
+                  variant={showCreatePost ? 'outline' : 'default'}
+                >
+                  {showCreatePost ? 'Cancel' : '+ Create Post'}
+                </Button>
+              </div>
 
-        <PostsFeed refreshTrigger={refreshTrigger} showActions={true} />
+              {showCreatePost && (
+                <CreatePostForm
+                  onSuccess={handlePostCreated}
+                  onCancel={() => setShowCreatePost(false)}
+                />
+              )}
+
+              <PostsFeed refreshTrigger={refreshTrigger} showActions={true} />
+            </div>
+          )}
+
+          {activeTab === 'funding' && (
+            <div>
+              <FundingAgreementsList />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

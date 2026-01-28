@@ -18,19 +18,55 @@ interface ChatInterfaceProps {
     lastName: string;
     role: string;
   };
+  onMessageSent?: () => void;
 }
 
-export function ChatInterface({ conversationId, currentUserId, otherUser }: ChatInterfaceProps) {
-  const { messages, loading, sendMessage, markAsRead } = useMessages(conversationId);
+export function ChatInterface({
+  conversationId,
+  currentUserId,
+  otherUser,
+  onMessageSent,
+}: ChatInterfaceProps) {
+  const { messages, loading, sendMessage, markAsRead, loadMore, hasMore } =
+    useMessages(conversationId);
   const [messageInput, setMessageInput] = useState('');
   const [expirationHours, setExpirationHours] = useState<number | undefined>();
   const [sending, setSending] = useState(false);
+  const [userScrolled, setUserScrolled] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(messages.length);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom only when user hasn't manually scrolled
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    // Only auto-scroll if new messages arrived and user hasn't manually scrolled
+    if (messages.length > prevMessagesLengthRef.current && !userScrolled) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages, userScrolled]);
+
+  // Handle scroll events
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+
+      // Update user scrolled state
+      setUserScrolled(!isAtBottom);
+
+      // Load more messages when scrolling to top
+      if (scrollTop < 100 && hasMore && !loading) {
+        loadMore();
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loading, loadMore]);
 
   // Mark messages as read when conversation opens
   useEffect(() => {
@@ -54,8 +90,20 @@ export function ChatInterface({ conversationId, currentUserId, otherUser }: Chat
     if (result.success) {
       setMessageInput('');
       setExpirationHours(undefined);
+      setUserScrolled(false); // Reset scroll state to allow auto-scroll
+
+      // Trigger quota refresh in parent
+      if (onMessageSent) {
+        onMessageSent();
+      }
+
+      // Scroll to bottom after sending
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     } else {
-      alert(result.error || 'Failed to send message');
+      // Gracefully handle error without alert
+      console.error('Failed to send message:', result.error);
     }
 
     setSending(false);
@@ -84,7 +132,7 @@ export function ChatInterface({ conversationId, currentUserId, otherUser }: Chat
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {loading && messages.length === 0 ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
