@@ -1,11 +1,13 @@
 'use client';
-import { AuthProvider, useAuth } from '@/context/authContext';
+import { useAuth } from '@/context/authContext';
 import ProfileForm from '@/components/forms/ProfileForm';
 
-function ProfilePageInner() {
+export default function ProfilePage() {
   const { user, loading } = useAuth();
+
   if (loading) return <div>Loading...</div>;
   if (!user) return null;
+
   return (
     <div className="space-y-6">
       <div className="md:flex md:items-center md:justify-between">
@@ -17,13 +19,5 @@ function ProfilePageInner() {
       </div>
       <ProfileForm userRole={user.role} userId={user.id} />
     </div>
-  );
-}
-
-export default function ProfilePage() {
-  return (
-    <AuthProvider requireAuth>
-      <ProfilePageInner />
-    </AuthProvider>
   );
 }
