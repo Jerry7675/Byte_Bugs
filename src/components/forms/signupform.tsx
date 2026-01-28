@@ -1,8 +1,9 @@
 'use client';
 import { signupUser } from '@/client/api/signup-user-payload';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signupSchema } from './validation/signupValidation';
 import HomeIcon from '@/components/common/HomeIcon';
@@ -10,6 +11,7 @@ import { PrismaEnums } from '@/enumWrapper';
 
 export default function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -25,6 +27,14 @@ export default function SignupForm() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [dirty, setDirty] = useState<{ [key: string]: boolean }>({});
   const [role, setRole] = useState<keyof typeof PrismaEnums.UserRole>('STARTUP');
+
+  // Set role from query param if present
+  useEffect(() => {
+    const roleParam = searchParams.get('role');
+    if (roleParam && (roleParam === 'STARTUP' || roleParam === 'INVESTOR')) {
+      setRole(roleParam as keyof typeof PrismaEnums.UserRole);
+    }
+  }, [searchParams]);
   const validateField = async (field: string, value: string) => {
     try {
       if (field === 'confirmPassword') {
@@ -150,6 +160,37 @@ export default function SignupForm() {
         <p className="mt-2 md:mt-4 text-base text-green-700/90 text-center">
           Please enter your details to create an account.
         </p>
+        {/* Role Slider with animation and improved style */}
+        <div className="flex justify-center mt-8 mb-8">
+          <div className="relative flex items-center w-78 h-14 bg-green-50 rounded-full border border-green-200 shadow-sm overflow-hidden">
+            {/* Animated background, perfectly aligned */}
+            <span
+              className={`absolute h-14 w-1/2 rounded-full transition-all duration-300 ease-in-out z-0 ${role === 'STARTUP' ? 'bg-green-600 left-0' : 'bg-green-600 left-1/2'}`}
+              style={{
+                transition: 'left 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s',
+              }}
+            />
+            <button
+              type="button"
+              className={`relative z-10 flex-1 px-6 py-3 rounded-full font-semibold text-lg transition-colors duration-200 ${role === 'STARTUP' ? 'text-white' : 'text-green-700 hover:bg-green-100'}`}
+              onClick={() => setRole('STARTUP')}
+              disabled={loading}
+              style={{ outline: 'none' }}
+            >
+              Startup
+            </button>
+            <button
+              type="button"
+              className={`relative z-10 flex-1 px-6 py-3 rounded-full font-semibold text-lg transition-colors duration-200 ${role === 'INVESTOR' ? 'text-white' : 'text-green-700 hover:bg-green-100'}`}
+              onClick={() => setRole('INVESTOR')}
+              disabled={loading}
+              style={{ outline: 'none' }}
+            >
+              Investor
+            </button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 md:mt-10">
           <div>
             <label className="font-medium text-green-900">First Name</label>

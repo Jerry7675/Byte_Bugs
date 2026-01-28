@@ -1,9 +1,18 @@
+// src/context/AuthContext.tsx
+'use client';
+
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 
+interface User {
+  id: string;
+  role: string;
+  email: string;
+}
+
 interface AuthContextType {
-  user: { id: string; role: string; email: string } | null;
+  user: User | null;
   loading: boolean;
   logout: () => void;
 }
@@ -21,33 +30,54 @@ export function AuthProvider({
   children: ReactNode;
   requireAuth?: boolean;
 }) {
-  const [user, setUser] = useState<{ id: string; role: string; email: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
+  // 🔑 single source of truth for auth hydration
+  const hydrateUser = () => {
     let token: string | null = null;
+
     if (typeof document !== 'undefined') {
       const match = document.cookie.match(/(?:^|; )accessToken=([^;]*)/);
       token = match ? decodeURIComponent(match[1]) : null;
     }
+
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        if (decoded && decoded.id && decoded.role && decoded.email) {
-          setUser({ id: decoded.id, email: decoded.email, role: decoded.role });
-        } else {
-          setUser(null);
+        if (decoded?.id && decoded?.role && decoded?.email) {
+          setUser({
+            id: decoded.id,
+            email: decoded.email,
+            role: decoded.role,
+          });
+          return;
         }
       } catch {
-        setUser(null);
+        // invalid token
       }
-    } else {
-      setUser(null);
     }
+
+    setUser(null);
+  };
+
+  // initial auth load
+  useEffect(() => {
+    hydrateUser();
     setLoading(false);
+
+    // Listen for custom authChanged event to re-hydrate user
+    const handleAuthChanged = () => {
+      hydrateUser();
+    };
+    window.addEventListener('authChanged', handleAuthChanged);
+    return () => {
+      window.removeEventListener('authChanged', handleAuthChanged);
+    };
   }, []);
 
+  // auth guard
   useEffect(() => {
     if (!loading && requireAuth && !user) {
       router.replace('/login');
@@ -58,7 +88,8 @@ export function AuthProvider({
     if (typeof document !== 'undefined') {
       document.cookie = 'accessToken=; Max-Age=0; path=/';
     }
-    setUser(null);
+
+    hydrateUser(); // 🔑 immediate state sync
     router.replace('/login');
   };
 
