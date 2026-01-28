@@ -85,17 +85,26 @@ export default function ProfileForm({ userRole, userId }: { userRole: string; us
     }
   };
 
-  if (loading) return <div>Loading profile...</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
+    <div className="bg-white shadow-sm rounded-xl p-6 md:p-8 border border-gray-100">
+      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
         {userRole === 'INVESTOR' ? 'Investor Profile' : 'Startup Profile'}
       </h2>
 
       {message && (
         <div
-          className={`p-4 mb-4 rounded-md ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}
+          className={`p-4 mb-6 rounded-lg border ${
+            message.type === 'success'
+              ? 'bg-green-50 text-green-800 border-green-200'
+              : 'bg-red-50 text-red-800 border-red-200'
+          }`}
         >
           {message.text}
         </div>

@@ -110,6 +110,16 @@
   background: #e5e7eb;
 }
 
+.verifiedBadge {
+  margin-left: auto;
+  font-size: 0.85rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #22c55e;
+  color: white;
+  font-weight: 600;
+}
+
 .footer {
   border-top: 1px solid #e5e7eb;
   padding: 1rem;
