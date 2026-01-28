@@ -107,7 +107,7 @@ export default function ProfileSidebar({ open, onClose, onLogout, user }: Profil
               <Link href="/settings" className={styles.link} onClick={onClose}>
                 <span className={styles.bullet} /> Settings
               </Link>
-              <Link href="/inbox" className={styles.link} onClick={onClose}>
+              <Link href="/messages" className={styles.link} onClick={onClose}>
                 <span className={styles.bullet} /> Inbox
                 <span className={styles.badge}>14</span>
               </Link>

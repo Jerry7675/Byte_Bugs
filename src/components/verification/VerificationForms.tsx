@@ -7,7 +7,13 @@
 import { useState, useEffect } from 'react';
 import { useSubmitVerification } from '@/client/hooks/useVerification';
 
-export function IdentityVerificationForm({ onSuccess, initialData }: { onSuccess?: () => void; initialData?: any }) {
+export function IdentityVerificationForm({
+  onSuccess,
+  initialData,
+}: {
+  onSuccess?: () => void;
+  initialData?: any;
+}) {
   const { submit, submitting, error } = useSubmitVerification();
 
   const [formData, setFormData] = useState({
@@ -39,7 +45,7 @@ export function IdentityVerificationForm({ onSuccess, initialData }: { onSuccess
         type: 'IDENTITY',
         metadata: {
           ...formData,
-          documentUrls: formData.documentUrls.filter((url) => url.trim() !== ''),
+          documentUrls: formData.documentUrls.filter((url: string) => url.trim() !== ''),
         },
       });
 
@@ -61,14 +67,14 @@ export function IdentityVerificationForm({ onSuccess, initialData }: { onSuccess
   const updateDocumentUrl = (index: number, value: string) => {
     setFormData((prev) => ({
       ...prev,
-      documentUrls: prev.documentUrls.map((url, i) => (i === index ? value : url)),
+      documentUrls: prev.documentUrls.map((url: string, i: number) => (i === index ? value : url)),
     }));
   };
 
   const removeDocumentUrl = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      documentUrls: prev.documentUrls.filter((_, i) => i !== index),
+      documentUrls: prev.documentUrls.filter((_: string, i: number) => i !== index),
     }));
   };
 
@@ -111,7 +117,7 @@ export function IdentityVerificationForm({ onSuccess, initialData }: { onSuccess
         <div>
           <label className="block text-sm font-medium mb-2">Document URLs *</label>
           <div className="space-y-2">
-            {formData.documentUrls.map((url, index) => (
+            {formData.documentUrls.map((url: string, index: number) => (
               <div key={index} className="flex gap-2">
                 <input
                   type="url"
@@ -176,7 +182,9 @@ export function IdentityVerificationForm({ onSuccess, initialData }: { onSuccess
           {submitting ? 'Submitting...' : initialData ? 'Update & Resubmit' : 'Submit Verification'}
         </button>
         {initialData && !hasChanges && (
-          <p className="text-sm text-amber-600 text-center">Please make changes before resubmitting</p>
+          <p className="text-sm text-amber-600 text-center">
+            Please make changes before resubmitting
+          </p>
         )}
       </form>
 
@@ -196,7 +204,13 @@ export function IdentityVerificationForm({ onSuccess, initialData }: { onSuccess
 /**
  * Example Role Verification Form for Investors
  */
-export function InvestorRoleVerificationForm({ onSuccess, initialData }: { onSuccess?: () => void; initialData?: any }) {
+export function InvestorRoleVerificationForm({
+  onSuccess,
+  initialData,
+}: {
+  onSuccess?: () => void;
+  initialData?: any;
+}) {
   const { submit, submitting, error } = useSubmitVerification();
 
   const [formData, setFormData] = useState({
@@ -228,7 +242,7 @@ export function InvestorRoleVerificationForm({ onSuccess, initialData }: { onSuc
         type: 'ROLE',
         metadata: {
           proofType: formData.proofType,
-          proofUrls: formData.proofUrls.filter((url) => url.trim() !== ''),
+          proofUrls: formData.proofUrls.filter((url: string) => url.trim() !== ''),
           accreditationNumber: formData.accreditationNumber || undefined,
           fundAmount: formData.fundAmount ? parseFloat(formData.fundAmount) : undefined,
         },
@@ -264,7 +278,7 @@ export function InvestorRoleVerificationForm({ onSuccess, initialData }: { onSuc
 
         <div>
           <label className="block text-sm font-medium mb-2">Proof Document URLs *</label>
-          {formData.proofUrls.map((url, index) => (
+          {formData.proofUrls.map((url: string, index: number) => (
             <div key={index} className="flex gap-2 mb-2">
               <input
                 type="url"
@@ -319,7 +333,9 @@ export function InvestorRoleVerificationForm({ onSuccess, initialData }: { onSuc
           {submitting ? 'Submitting...' : initialData ? 'Update & Resubmit' : 'Submit Verification'}
         </button>
         {initialData && !hasChanges && (
-          <p className="text-sm text-amber-600 text-center">Please make changes before resubmitting</p>
+          <p className="text-sm text-amber-600 text-center">
+            Please make changes before resubmitting
+          </p>
         )}
       </form>
     </div>
@@ -329,7 +345,13 @@ export function InvestorRoleVerificationForm({ onSuccess, initialData }: { onSuc
 /**
  * Example Role Verification Form for Startups
  */
-export function StartupRoleVerificationForm({ onSuccess, initialData }: { onSuccess?: () => void; initialData?: any }) {
+export function StartupRoleVerificationForm({
+  onSuccess,
+  initialData,
+}: {
+  onSuccess?: () => void;
+  initialData?: any;
+}) {
   const { submit, submitting, error } = useSubmitVerification();
 
   const [formData, setFormData] = useState({
@@ -363,7 +385,7 @@ export function StartupRoleVerificationForm({ onSuccess, initialData }: { onSucc
         type: 'ROLE',
         metadata: {
           proofType: formData.proofType,
-          proofUrls: formData.proofUrls.filter((url) => url.trim() !== ''),
+          proofUrls: formData.proofUrls.filter((url: string) => url.trim() !== ''),
           incorporationNumber: formData.incorporationNumber || undefined,
           incorporationDate: formData.incorporationDate || undefined,
           gstNumber: formData.gstNumber || undefined,
@@ -400,7 +422,7 @@ export function StartupRoleVerificationForm({ onSuccess, initialData }: { onSucc
 
         <div>
           <label className="block text-sm font-medium mb-2">Proof Document URLs *</label>
-          {formData.proofUrls.map((url, index) => (
+          {formData.proofUrls.map((url: string, index: number) => (
             <div key={index} className="flex gap-2 mb-2">
               <input
                 type="url"
@@ -465,10 +487,16 @@ export function StartupRoleVerificationForm({ onSuccess, initialData }: { onSucc
           disabled={submitting || (initialData && !hasChanges)}
           className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? 'Submitting...' : initialData ? 'Update & Resubmit' : 'Submit Role Verification'}
+          {submitting
+            ? 'Submitting...'
+            : initialData
+              ? 'Update & Resubmit'
+              : 'Submit Role Verification'}
         </button>
         {initialData && !hasChanges && (
-          <p className="text-sm text-amber-600 text-center">Please make changes before resubmitting</p>
+          <p className="text-sm text-amber-600 text-center">
+            Please make changes before resubmitting
+          </p>
         )}
       </form>
     </div>

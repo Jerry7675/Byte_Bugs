@@ -105,15 +105,18 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
-    verificationApplications VerificationApplication[]
-    posts                    Post[]
-    reviewedVerifications    VerificationApplication[] @relation("VerificationReviewer")
-    
-    // Multi-stage verification
-    verificationStages       VerificationStage[]
-    reviewedStages          VerificationStage[] @relation("StageReviewer")
-    activityMetrics         ActivityMetric?
-    communityMetrics        CommunityMetric?
+  verificationApplications VerificationApplication[]
+  posts                    Post[]
+  reviewedVerifications    VerificationApplication[] @relation("VerificationReviewer")
+  
+  // Multi-stage verification
+  verificationStages       VerificationStage[]
+  reviewedStages          VerificationStage[] @relation("StageReviewer")
+  activityMetrics         ActivityMetric?
+  communityMetrics        CommunityMetric?
+  
+  // Daily message quota tracking
+  messageQuota            MessageQuota?
 }
 
 model Session {
@@ -220,13 +223,26 @@ model Conversation {
 
 model Message {
   id             String        @id @default(uuid())
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   conversationId String
   sender         User          @relation(fields: [senderId], references: [id])
   senderId       String
   content        String
 
+  // Disappearing message feature
+  expiresAt      DateTime?     // Absolute expiration timestamp (min 1 hour from creation)
+  isExpired      Boolean       @default(false) // Soft delete flag for cleanup
+  
+  // Read status (optional for future enhancement)
+  isRead         Boolean       @default(false)
+  readAt         DateTime?
+
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@index([conversationId, createdAt])
+  @@index([expiresAt])
+  @@index([senderId])
 }
 
 model Review {
@@ -406,4 +422,24 @@ model CommunityMetric {
   lastCalculatedAt    DateTime @default(now())
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+}
+
+// Daily message quota tracking (20 free messages per day, then points-based)
+model MessageQuota {
+  id                String   @id @default(uuid())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String   @unique
+  
+  // Daily quota tracking
+  messagesSentToday Int      @default(0)
+  quotaDate         DateTime @default(now()) // Date for which this quota applies
+  
+  // Configuration
+  dailyFreeLimit    Int      @default(20)
+  pointsPerMessage  Int      @default(10) // Points to deduct after free limit
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId, quotaDate])
 }
