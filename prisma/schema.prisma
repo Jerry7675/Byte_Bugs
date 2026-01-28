@@ -188,7 +188,8 @@ model StartupProfile {
   userId      String   @unique
 
   name        String
-  description String?
+  bio         String?  // Short bio for profile display
+  description String?  // Detailed description
   website     String?
   stage       String?   // idea, seed, series-a (string for MVP)
 
