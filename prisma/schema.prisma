@@ -47,6 +47,15 @@ enum PostCategory {
   OTHER
 }
 
+enum PostType {
+  FUNDING_REQUEST
+  INVESTMENT_OFFER
+  UPDATE
+  ANNOUNCEMENT
+  MILESTONE
+  OTHER
+}
+
 enum PointsTxType {
   PURCHASE
   SPEND
@@ -262,14 +271,21 @@ model VerificationApplication {
 }
 
 model Post {
-  id          String   @id @default(uuid())
-  author      User     @relation(fields: [authorId], references: [id])
+  id          String       @id @default(uuid())
+  author      User         @relation(fields: [authorId], references: [id])
   authorId    String
   title       String
   content     String
+  imageUrl    String?      // Supabase S3 URL
   category    PostCategory
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  postType    PostType     @default(UPDATE)
+  tags        String[]     @default([])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  @@index([authorId])
+  @@index([category])
+  @@index([postType])
 }
 
 model Category {
