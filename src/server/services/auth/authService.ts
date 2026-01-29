@@ -132,11 +132,11 @@ export async function loginUserService(params: {
         where: { id: existingSession.id },
       });
     }
-    const AccessTokenExpiryMinutes = 60;
+    const AccessTokenExpiryMinutes = 240;
 
     // Generate access token only
     const accessToken = JwtService.sign({ id: user.id, email: user.email, role: user.role });
-    const accessTokenExpiresAt = addMinutes(new Date(), AccessTokenExpiryMinutes); // 1 hour for access token
+    const accessTokenExpiresAt = addMinutes(new Date(), AccessTokenExpiryMinutes); // 4 hour for access token
 
     // Store session
     await prisma.session.create({
@@ -155,7 +155,7 @@ export async function loginUserService(params: {
         secure: false, // fasle as we are using in dev , i.e http
         sameSite: 'lax',
         path: '/',
-        maxAge: AccessTokenExpiryMinutes * 60 * 2, // 2 hours for now hai
+        maxAge: AccessTokenExpiryMinutes * 60 * 4, // 4 hours for now hai
       });
     }
 

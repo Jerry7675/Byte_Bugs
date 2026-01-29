@@ -215,9 +215,9 @@ export default function FundingAgreementDetail({
   };
 
   const formatCurrency = (amount: any) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('np-NP', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'NPR',
     }).format(parseFloat(amount));
   };
 

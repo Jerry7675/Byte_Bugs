@@ -7,10 +7,10 @@
 
 import { useAuth } from '@/context/authContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { FundingRequestForm } from '@/components/funding';
 
-export default function CreateFundingAgreementPage() {
+function CreateFundingAgreementContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -100,5 +100,19 @@ export default function CreateFundingAgreementPage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function CreateFundingAgreementPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      }
+    >
+      <CreateFundingAgreementContent />
+    </Suspense>
   );
 }
