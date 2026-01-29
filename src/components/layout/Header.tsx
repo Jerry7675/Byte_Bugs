@@ -48,25 +48,25 @@ const Header = () => {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-8">
               <Link
-                href="#"
+                href="/for-startups"
                 className="text-green-700 hover:text-green-900 transition-colors font-medium"
               >
                 For Startups
               </Link>
               <Link
-                href="#"
+                href="/for-investors"
                 className="text-green-700 hover:text-green-900 transition-colors font-medium"
               >
                 For Investors
               </Link>
               <Link
-                href="#"
+                href="/pricing"
                 className="text-green-700 hover:text-green-900 transition-colors font-medium"
               >
                 Pricing
               </Link>
               <Link
-                href="#"
+                href="/about"
                 className="text-green-700 hover:text-green-900 transition-colors font-medium"
               >
                 About
@@ -147,25 +147,25 @@ const Header = () => {
             <div className="md:hidden py-4 border-t border-green-200">
               <nav className="flex flex-col gap-4">
                 <Link
-                  href="#"
+                  href="/for-startups"
                   className="text-green-700 hover:text-green-900 transition-colors font-medium py-2"
                 >
                   For Startups
                 </Link>
                 <Link
-                  href="#"
+                  href="/for-investors"
                   className="text-green-700 hover:text-green-900 transition-colors font-medium py-2"
                 >
                   For Investors
                 </Link>
                 <Link
-                  href="#"
+                  href="/pricing"
                   className="text-green-700 hover:text-green-900 transition-colors font-medium py-2"
                 >
                   Pricing
                 </Link>
                 <Link
-                  href="#"
+                  href="/about"
                   className="text-green-700 hover:text-green-900 transition-colors font-medium py-2"
                 >
                   About
