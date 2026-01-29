@@ -67,11 +67,12 @@ export function SwipeCard({ profile, onSwipe, style }: SwipeCardProps) {
                 src={profilePhoto}
                 alt={`${profile.firstName} ${profile.lastName}`}
                 fill
-                className="object-cover"
+                className="object-cover select-none pointer-events-none"
                 onError={() => setImageError(true)}
+                draggable={false}
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+              <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center select-none">
                 {profile.role === 'STARTUP' ? (
                   <Building2 className="w-32 h-32 text-white/80" strokeWidth={1.5} />
                 ) : (
