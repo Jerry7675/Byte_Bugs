@@ -50,17 +50,17 @@ const Footer = () => {
             <h4 className="font-display font-semibold text-green-900 mb-4">Platform</h4>
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="text-green-700 hover:text-green-900 transition-colors">
+                <Link href="/for-startups" className="text-green-700 hover:text-green-900 transition-colors">
                   For Startups
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-green-700 hover:text-green-900 transition-colors">
+                <Link href="/for-investors" className="text-green-700 hover:text-green-900 transition-colors">
                   For Investors
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-green-700 hover:text-green-900 transition-colors">
+                <Link href="/pricing" className="text-green-700 hover:text-green-900 transition-colors">
                   Pricing
                 </Link>
               </li>
@@ -76,7 +76,7 @@ const Footer = () => {
             <h4 className="font-display font-semibold text-green-900 mb-4">Company</h4>
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="text-green-700 hover:text-green-900 transition-colors">
+                <Link href="/about" className="text-green-700 hover:text-green-900 transition-colors">
                   About Us
                 </Link>
               </li>
@@ -107,17 +107,17 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-green-700 hover:text-green-900 transition-colors">
+                <a href="mailto:sandeshchhettri5677@gmail.com" className="text-green-700 hover:text-green-900 transition-colors">
                   Contact Us
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="#" className="text-green-700 hover:text-green-900 transition-colors">
+                <Link href="/privacy-policy" className="text-green-700 hover:text-green-900 transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-green-700 hover:text-green-900 transition-colors">
+                <Link href="/terms-of-service" className="text-green-700 hover:text-green-900 transition-colors">
                   Terms of Service
                 </Link>
               </li>

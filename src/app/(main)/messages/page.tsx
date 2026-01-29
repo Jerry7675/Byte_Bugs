@@ -51,7 +51,7 @@ export default function MessagesPage() {
   });
 
   return (
-    <div className="h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-gray-50 border border-gray-200 rounded-lg">
       {/* Top Bar */}
       <div className="border-b border-gray-200 p-4 shrink-0">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -64,11 +64,11 @@ export default function MessagesPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden bg-white rounded-lg">
         {/* Sidebar */}
         <div className="w-80 border-r border-gray-200 flex flex-col bg-white shrink-0">
           {/* Search */}
-          <div className="p-3 border-b border-gray-200">
+          <div className="p-3 border-b border-green-200">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -169,7 +169,7 @@ export default function MessagesPage() {
               onMessageSent={refetchQuota}
             />
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-500">
+            <div className="flex-1 flex items-center justify-center text-gray-500 rounded-lg">
               <div className="text-center">
                 <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <p className="text-lg">Select a conversation to start messaging</p>
