@@ -105,7 +105,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4">
+      <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-6">
             <div className="h-64 bg-white rounded-xl"></div>
@@ -119,7 +119,7 @@ export default function ProfilePage() {
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 py-8 px-4 flex items-center justify-center">
         <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center max-w-md">
           <p className="text-red-700 text-lg font-medium mb-4">{error || 'Profile not found'}</p>
           <button
@@ -151,7 +151,7 @@ export default function ProfilePage() {
     profile.profile.photo && isValidImageUrl(profile.profile.photo) && !imageError;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Back Button */}
         <button

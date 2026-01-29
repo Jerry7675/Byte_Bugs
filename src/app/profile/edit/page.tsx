@@ -154,7 +154,7 @@ export default function EditProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 py-8 px-4 flex items-center justify-center">
         <div className="text-center">
           <Loader className="w-12 h-12 text-green-600 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading profile...</p>
@@ -165,7 +165,7 @@ export default function EditProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 py-8 px-4 flex items-center justify-center">
         <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
           <p className="text-red-700">Failed to load profile</p>
         </div>
@@ -177,7 +177,7 @@ export default function EditProfilePage() {
   const isStartup = profile.user.role === 'STARTUP';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <button
